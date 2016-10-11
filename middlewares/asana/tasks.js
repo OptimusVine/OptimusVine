@@ -7,9 +7,17 @@ var mongoose = require('mongoose')
 
 var ToDo = mongoose.model('ToDo')
 
-var keys = require('../../private/keys.js')
+var env = process.env.NODE_ENV
 
-var token = keys.asana.token
+if(env == "development"){
+	var token = require('../../private/keys').asana.token
+} else {
+	var token = process.env.asana_token_kjiel
+}
+
+//var keys = require('../../private/keys.js')
+
+//var token = keys.asana.token
 
 if (token){console.log("\n ----- Asana Token: ***HIDDEN*** ----- \n" )}
 
@@ -142,8 +150,9 @@ exports.pullTasks = function(req, res){
 
 //Enter a downloaded tasks and enter them into the DB
 exports.processDownloadedTask = function(asanaRecord){
-	return new Promise(function(resolve, reject){
-		if(asanaRecord.name.slice(-1) == ":"){reject(new Error("This is a section"))
+	return new Promise(function(reject, resolve){
+		if(asanaRecord.name.slice(-1) == ":"){
+			reject("This is a section")
 			} else {
 				query = ToDo.findOne({'asana_id': asanaRecord.id})
 				query.exec(function(err, todo){

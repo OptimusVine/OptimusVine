@@ -4,9 +4,22 @@ console.log("Calling : " + sLoc)
 var request = require('request')
 var mongoose = require('mongoose')
 
+var env = process.env.NODE_ENV
+
+if(env == "development"){
+	var keys = require('../../private/keys')
+	var userId = keys.autodesk.userId
+	var password = keys.autodesk.password
+} else {
+	var token = process.env.asana_token_kjiel
+	var userId = process.env.autodesk_userId_kjiel
+	var password = process.env.autodesk_password_kjiel
+}
+/*
 var keys = require ('../../private/keys.js')
 var userId = keys.autodesk.userId
 var password = keys.autodesk.password
+*/
 
 var sessionid = "";
 var cookieString = "";
