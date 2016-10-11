@@ -10,7 +10,9 @@
     "mongoose": "^4.6.0",
     "morgan": "^1.7.0",
     "path": "^0.12.7",
-    "router": "^1.1.4"
+    "router": "^1.1.4",
+    "ejs": "^2.5.2",
+    "bluebird": "^3.4.6"
   },
   "devDependencies": {},
   "scripts": {
