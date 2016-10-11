@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.10/angular-ui-router.js"></script>
+    <script src="/javascripts/angularApp.js"></script>
+
+ <script type="text/ng-template" id="/works.html">
+          <div class="page-header" style="margin-left:30px">  
+ 		<div>
+ 			<table class="table table-hover">
+ 				<tr>
+ 					<th>Name</th>
+ 					<th>Summary</th>
+ 					<th>Id Date</th>
+ 					<th>Details</th>
+ 				</tr>
+
+ 				<tr ng-repeat="work in works">
+ 					<td>{{work.name}}</td>
+ 					<td>{{work.summary}}</td>
+ 					<td>{{work.id}}</td>
+ 					<td>
+ 						<a href="#/works/{{work._id}}">
+						<button>Wine</button></td>
+						</a>
+ 				</tr>
+
+ 			</table>
+ 		</div>
+    	</div>
+    </script>

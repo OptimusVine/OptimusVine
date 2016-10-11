@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.10/angular-ui-router.js"></script>
+    <script src="/javascripts/angularApp.js"></script>
+
+ <script type="text/ng-template" id="/sites.html">
+          <div class="page-header" style="margin-left:30px">  
+ 		<div>
+ 			<table class="table table-hover">
+ 				<tr>
+ 					<th>Name</th>
+ 					<th>Zip</th>
+ 					<th>Next Date</th>
+ 					<th>Details</th>
+ 				</tr>
+
+ 				<tr ng-repeat="site in sites">
+ 					<td>{{site.name}}</td>
+ 					<td>{{site.address.zip}}</td>
+ 					<td>{{site.nextDate | date : 'MM-dd-yyyy'}}</td>
+ 					<td>
+ 						<a href="#/sites/{{site._id}}">
+						<button>Site</button></td>
+						</a>
+ 				</tr>
+
+ 			</table>
+ 		</div>
+    	</div>
+    </script>

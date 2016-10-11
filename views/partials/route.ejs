@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.10/angular-ui-router.js"></script>
+    <script src="/javascripts/angularApp.js"></script>
+
+ <script type="text/ng-template" id="/route.html">
+ <div>
+
+ 	<div style="margin-left:30px">
+ 			<table class="table table-hover">
+ 				<tr>
+ 					<th>Key</th>
+ 					<th>Data</th>
+ 					<th>Action</th>
+ 				</tr>
+ 				<tr ng-repeat="(key, value) in route">
+  					<td> {{key}} </td> <td> {{ value }} </td>
+				</tr>
+ 			</table>
+ 	</div>
+ </script>

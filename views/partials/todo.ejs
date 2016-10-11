@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.10/angular-ui-router.js"></script>
+    <script src="/javascripts/angularApp.js"></script>
+
+ <script type="text/ng-template" id="/todo.html">
+ <div>
+ 	This is a single todo
+<br><br>
+ <div>
+
+ 	<div style="margin-left:30px">
+ 			<table class="table table-hover">
+ 				<tr>
+ 					<th>Key</th>
+ 					<th>Data</th>
+ 					<th>Action</th>
+
+ 				</tr>
+
+ 				<tr>
+ 					<td>Name</td>
+ 					<td><a href="https://app.asana.com/0/88419022206391/{{todo.asana_id}}">{{todo.name}}</td></a></td>
+ 					<td><button ng-click="pullUpdate(todo)">Refresh</button></td>
+ 				</tr>
+
+ 				<tr>
+ 					<td>Due Date</td>
+ 					<td>{{todo.dateDue | date : 'MM-dd-yyyy'}}</td>
+ 					<td>
+				      <button>Schedule</button>
+					</td>
+ 				</tr>
+ 				 <tr>
+ 					<td>Summary</td>
+ 					<td>{{todo.summary}}</td>
+ 					<td><a href="#"><button>Todos</button></a></td>
+ 				</tr>
+ 				<tr>
+ 					<td>Assignee</td>
+ 					<td ng-show="todo.asana_assignee.name">{{todo.asana_assignee.name}}</td>
+ 					<td>
+ 						<span ng-show="!forAssignment">
+ 							<button ng-click="pleaseAssign()">Assign</button>
+ 						</span>
+
+ 						<span ng-show="forAssignment">
+ 							<form name="assignForm" class="form-inLine" ng-submit="assignToDo(todo._id, choice)">
+ 								<select name="assignSelect" id="assignSelect" ng-model="choice" style="form-control">
+ 									<option ng-repeat="user in users" value="{{user.asanaId}}">{{user.name}}</option>
+ 								</select>
+ 								<button type="submit" class="btn btn-default">Assign</button>
+ 							</form>
+ 						</span>
+ 					</td>
+ 				</tr>
+
+ 				<tr>
+ 					<td>Status</td>
+ 					<td>{{todo.complete}}</td>
+ 					<td><button ng-click="complete(todo._id)">Complete</button></td>
+ 				<tr>
+
+ 			</table>
+ 		</div>
+
+ </script>

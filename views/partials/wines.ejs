@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.10/angular-ui-router.js"></script>
+    <script src="/javascripts/angularApp.js"></script>
+
+ <script type="text/ng-template" id="/wines.html">
+          <div class="page-header" style="margin-left:30px">  
+ 		<div>
+ 			<table class="table table-hover">
+ 				<tr>
+ 					<th>Name</th>
+ 					<th>Summary</th>
+ 					<th>Id Date</th>
+ 					<th>Details</th>
+ 				</tr>
+
+ 				<tr ng-repeat="wine in wines">
+ 					<td>{{wine.name}}</td>
+ 					<td>{{wine.summary}}</td>
+ 					<td>{{wine.id}}</td>
+ 					<td>
+ 						<a href="#/wines/{{wine._id}}">
+						<button>Wine</button></td>
+						</a>
+ 				</tr>
+
+ 			</table>
+ 		</div>
+    	</div>
+    </script>

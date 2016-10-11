@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.10/angular-ui-router.js"></script>
+    <script src="/javascripts/angularApp.js"></script>
+
+ <script type="text/ng-template" id="/todos.html">
+ <div style="margin-left:30px">
+ 	This is a todos page
+
+ 	<div ng-show="!newTodo">
+ 		Create a new ToDo here on <button ng-click="startNewTodo()">Click</button>, load up into Asana 
+ 	</div>
+
+ 	<div ng-show="newTodo">
+ 		Enter the name, summary, assignee and date of the ToDo
+ 		<form ng-submit="addToDo()" style="margin-top:30px">
+ 		<h3>Add new ToDo</h3>
+ 		<table>
+ 			<tr>
+ 				<td>Name:</td><td><input type="text" class="form-control" placeholder="Make me Coffee" ng-model="name"></input></td>
+ 				<td>Summary:</td><td><input type="text" class="form-control" placeholder="It better be good!" ng-model="summary"></input></td>
+ 				<td>Assignee:</td><td><select name="assignSelect" id="assignSelect" ng-model="assignee" style="form-control">
+ 									<option ng-repeat="user in users" value="{{user.asanaId}}">{{user.name}}</option>
+ 										</select></td>
+ 			</tr>
+ 			<tr><button type="submit" class="btn btn-default">Save</button></tr>
+
+
+ 		</table>
+ 		</form>
+ 	</div>
+ 	<br>
+
+ 	<div>
+ 		<span ng-show="!visible"><button class="btn btn-default" ng-click="changeVisibility()">Show All</button></span>
+ 		<span ng-show="visible"><button class="btn btn-default" ng-click="changeVisibility()">Hide Complete</button></span>
+ 	</div>
+
+ 	<div>
+ 		<span ng-show="!lastUpdate"><button class="btn btn-default" ng-click="pullIncomplete()">Pull New</button></span>
+ 		<span ng-show="lastUpdate"><button class="btn btn-default" ng-click="reloadRoute()">Downloaded - Please Refresh</button></span>
+ 	</div>
+
+ 	<div class="page-header">  
+ 		<div>
+ 			<table class="table table-hover">
+ 				<tr>
+ 					<th>Name</th>
+ 					<th>Asana ID</th>
+ 					<th>Project</th>
+ 					<th>Due Date</th>
+ 					<th>Status</th>
+ 					<th>Details</th>
+ 				</tr>
+
+ 				<tr ng-repeat="todo in todos | orderBy:'asana_id'" ng-show="!todo.complete || visible">
+ 					<td>{{todo.name}}</td>
+ 					<td>{{todo.asana_id}}</td>
+ 					<td>{{todo.projects[0].name}}</td>
+ 					<td>{{todo.dateDue | date : 'MM-dd-yyyy'}}</td>
+ 					<td>{{todo.complete}}</td>
+ 					<td>
+ 						<a href="#/todos/{{todo._id}}">
+						<button>Todo</button></td>
+						</a>
+ 				</tr>
+
+ 			</table>
+ 		</div>
+    	</div>
+ <div>
+ </script>
