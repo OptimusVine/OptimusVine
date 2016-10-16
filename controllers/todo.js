@@ -7,13 +7,23 @@ var ToDo = mongoose.model('ToDo')
 
 var asana = require('../middlewares/asana/tasks');
 
-exports.getTodos = function(req, res, next){
+var getTodos = function(req, res, next){
 	ToDo.find(function(err, todos){
 				res.json(todos)
 	})
 }
 
-exports.postTodos = function(req, res, next){
+var getMyTasks = function(req, res, next){
+	console.log("Assignee via Request: " + req.assignee)
+	var assignee = 10363492364586
+	asana.pullTasksMyTasks(assignee).then(function(tasks){
+		return processDownloadedTask(tasks)
+	}).catch(function(err){}).then(function(todos){
+		res.send(todos)
+	})
+}
+
+var postTodos = function(req, res, next){
 	if(!req.body.name){res.status(400).send('Something broke!');
 		} else {
 			//console.log("Body received: " + req.body)
@@ -34,7 +44,7 @@ exports.postTodos = function(req, res, next){
 
 }
 
-exports.completeToDo = function(req, res, next){
+var completeToDo = function(req, res, next){
 	asana.completeTask(req).then(function(task){
 		console.log(task)
 		res.send(task)
@@ -43,7 +53,7 @@ exports.completeToDo = function(req, res, next){
 
 // Pulls all incomplete tasks based on the hardcoded list
 // calls a function in the asana file to grab project list one by one
-exports.pullIncompleteTasks = function(req, res){
+var pullIncompleteTasks = function(req, res){
 	projects = [159790025348212, 168506215476292, 88419022206391]
 	projectCount = 0
 	resultCount = 0
@@ -91,7 +101,7 @@ exports.pullIncompleteTasks = function(req, res){
 // When called, pull an update on all tasks showing incomplete in DB
 // Goes Tasks by Task, pulling the update from Asana, updating to DB
 // At end, returns all tasks in Response
-exports.updateIncompleteTasks = function(req, res){
+var updateIncompleteTasks = function(req, res){
 	var list = []
 	ToDo.find({"complete":false}, function(err, results){
 		for(i=0;i<results.length;i++){
@@ -110,7 +120,7 @@ exports.updateIncompleteTasks = function(req, res){
 }
 
 
-exports.pullTodos = function(req, res){
+var pullTodos = function(req, res){
 	asana.pullTasks(req, res).then(function(tasks){
 		console.log(tasks.length + " Tasks received, preparing to process")
 		return processDownloadedTask(tasks)
@@ -120,12 +130,12 @@ exports.pullTodos = function(req, res){
 	})
 }
 
-exports.pullFullTask = function(req, res){
+var pullFullTask = function(req, res){
 	console.log(req.todo._id)
 	asana.updateTask(req, res)
 }
 
-exports.todoPutByIdAssign = function(req, res){
+var todoPutByIdAssign = function(req, res){
 	console.log(req.assignee + ", please assignt to task " + req.todo)
 	asana.assignTask(req, res)
 }
@@ -133,6 +143,7 @@ exports.todoPutByIdAssign = function(req, res){
 
 var processDownloadedTask = function(tasks){
 	processedTodos = []
+	console.log("I am in : processDownloadedTask")
 	return new Promise(function(resolve){
 		for(i=0; i<tasks.length; i++){
 			asana.processDownloadedTask(tasks[i]).then(function(todo){
@@ -145,4 +156,16 @@ var processDownloadedTask = function(tasks){
 			})
 		}
 	})
+}
+
+module.exports = {
+	todoPutByIdAssign: todoPutByIdAssign,
+	pullFullTask: pullFullTask,
+	pullTodos: pullTodos,
+	completeToDo: completeToDo,
+	getTodos: getTodos,
+	postTodos: postTodos, 
+	pullIncompleteTasks: pullIncompleteTasks,
+	updateIncompleteTasks: updateIncompleteTasks,
+	getMyTasks: getMyTasks
 }

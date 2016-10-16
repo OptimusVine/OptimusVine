@@ -19,7 +19,8 @@ Take an array of addresses, and provide with Tech it is best suited for
 */
 
 var env = process.env.NODE_ENV = process.env.NODE_ENV || 'development'
-var configDB = require('./config/database.js')
+console.log(env + " Is our Environment")
+var configDB = require('./config/database.js') 
 mongoose.Promise = global.Promise;
 mongoose.connect(configDB.url[env])
 

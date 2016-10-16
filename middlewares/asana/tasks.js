@@ -1,13 +1,18 @@
 var sLoc = __filename.substring(process.cwd().length,__filename.length);
 console.log("Calling : " + sLoc)
 
+var Promise = require('Bluebird')
+
 var request = require('request')
 var events = require('events')
 var mongoose = require('mongoose')
 
+var model = require('../../models/todo')
+
 var ToDo = mongoose.model('ToDo')
 
-var env = process.env.NODE_ENV
+//var env = process.env.NODE_ENV
+var env = 'development'
 
 if(env == "development"){
 	var token = require('../../private/keys').asana.token
@@ -23,6 +28,23 @@ if (token){console.log("\n ----- Asana Token: ***HIDDEN*** ----- \n" )}
 
 
 var projectId = 88419022206391
+var workspaceId = 2733326967720
+
+var pullWorkspaces = function(){
+	options = {
+	    "method":"GET",
+	    "url": "https://app.asana.com/api/1.0/workspaces",
+	    "headers": {
+	        "Accept": "application/json"
+	    ,   "Authorization": "Bearer " + token}
+	}
+
+	request(options, function(err, response){
+			if(err){console.log(err)}
+			console.log(response.body)
+		})
+
+}
 
 var resetOptionsProject = function(project){
 	options = {
@@ -35,7 +57,7 @@ var resetOptionsProject = function(project){
 
 var resetOptionsTask = function(task){
 
-	options = {
+options = {
     "method":"GET",
     "url": "https://app.asana.com/api/1.0/tasks/" + task.asana_id,
     "headers": {
@@ -45,7 +67,7 @@ var resetOptionsTask = function(task){
 	}
 
 // Pulls all incompplete tasks for a given project
-exports.pullIncompleteTasks = function(projectId){
+var pullIncompleteTasks = function(projectId){
 	options = {
 	    "method":"GET",
 	    "url": "https://app.asana.com/api/1.0/tasks?project=" + projectId + "&completed_since=now",
@@ -65,6 +87,29 @@ exports.pullIncompleteTasks = function(projectId){
 			if(err){console.log(err)}
 		//	console.log(response.body.data)
 			resolve(response.body.data)
+		})
+	})
+}
+
+var pullTasksMyTasks = function(assignee){
+	if(!assignee){var assignee = 10363492364586}
+	options = {
+	    "method":"GET",
+	    "url": "https://app.asana.com/api/1.0/tasks?workspace="+ workspaceId + "&assignee=me&completed_since=now",
+	    "headers": {
+	        "Accept": "application/json"
+	    ,   "Authorization": "Bearer " + token}
+	}
+
+	return new Promise(function(resolve, reject){
+	request(options, function(err, response){
+			if(err){console.log(err)}
+			var resBody	= JSON.parse(response.body)
+			resBody.data.forEach(function(t){
+			//	console.log(t)
+			})
+			resolve(resBody.data)
+		//	console.log(response.body.data)
 		})
 	})
 }
@@ -129,7 +174,7 @@ exports.assignTask = function(req, res){
 }
 
 // Pulls ALL tasks, complete or not, from a hardcoded project
-exports.pullTasks = function(req, res){
+var pullTasks = function(req, res){
 	return new Promise(function(resolve){
 	resetOptionsProject(projectId)		
  	request(options, function(err, response){
@@ -149,20 +194,20 @@ exports.pullTasks = function(req, res){
 }
 
 //Enter a downloaded tasks and enter them into the DB
-exports.processDownloadedTask = function(asanaRecord){
-	return new Promise(function(reject, resolve){
+var processDownloadedTask = function(asanaRecord){
+	return new Promise(function(resolve, reject){
 		if(asanaRecord.name.slice(-1) == ":"){
-			reject("This is a section")
+			reject(new Error("This is a section" ))
 			} else {
 				query = ToDo.findOne({'asana_id': asanaRecord.id})
-				query.exec(function(err, todo){
+				query.exec().then(function(todo){
+					return todo
+				}).then(function(todo){
+
 					if(!todo){
-					//	console.log('No ToDo found with Asana id : ' + asanaRecord.id)
 						t = new ToDo({
 							name: asanaRecord.name,
 							asana_id:asanaRecord.id,
-						//	summary:asanaRecord.notes,
-						// 	assignee:asanaRecord.assignee
 						})
 						t.save(function(err, tNew){
 							pullTask(tNew).then(function(todo){
@@ -171,20 +216,30 @@ exports.processDownloadedTask = function(asanaRecord){
 
 						})
 
-					} else {
-					//	console.log("Todo already exists : " + asanaRecord.id)
-						pullTask(todo).then(function(todo){
+					} else { // If Task Exists in DB, go pull update from Asana
+						pullTask(todo)
+						.then(function(todo){
+						//	console.log(todo)
 							resolve(todo)
 						})
+						/*
+						.catch(function(err){
+							console.log("I am erroring out here")
+						//	console.log(err)
+						})
+						*/
+						
 
 					}
+
+
 				})
 			}
 	})
 }
 
 // A Todo is send via a reqeust, it then pulls from Asana --- loaded to DB and send full todo back
-exports.Task = function(req, res){
+var Task = function(req, res){
 	t = req.todo
 	pullTask(t).then(function(todo){
 		res.send(todo)
@@ -193,7 +248,7 @@ exports.Task = function(req, res){
 }
 
 // exported function to pass a Todo that needs to be updated 
-exports.updateTask = function(t){
+var updateTask = function(t){
 	return new Promise(function(resolve, reject){ 
 		pullTask(t).then(function(todo){
 			resolve(todo)
@@ -216,9 +271,13 @@ var pullTask = function(t){
 			//		console.log('Status Code: ' + response.statusCode)
 					var data = JSON.parse(response.body).data;
 				//	console.log(data)
+					console.log("Preparing up update task to DB")
 					updateAsanaInDatabase(data).then(function(todo){
-				//		console.log(todo)
+						console.log("I have updated the task in the DB")
 						resolve(todo)
+					}).catch(function(err){
+						console.log("Is the issue here?")
+				//		console.log(err)
 					})
 				}
 		})
@@ -226,7 +285,7 @@ var pullTask = function(t){
 }
 
 // Complete a task into Asana
-exports.completeTask = function(req){
+var completeTask = function(req){
 	resetOptionsTask(req.todo);
 		options.method = "PUT"		
 		options.json = {}
@@ -247,7 +306,6 @@ exports.completeTask = function(req){
 
 // Load full data pulled from the API into the DB
 var updateAsanaInDatabase = function(asanaResult){
-//	console.log(asanaResult.completed)
 	return new Promise(function(resolve){
 		if(asanaResult.id){
 			conditions = { 'asana_id': asanaResult.id};
@@ -269,4 +327,15 @@ var updateAsanaInDatabase = function(asanaResult){
 			resolve()
 		}
 	})
+}
+
+module.exports = {
+	pullWorkspaces: pullWorkspaces,
+	pullTasksMyTasks: pullTasksMyTasks,
+	processDownloadedTask: processDownloadedTask,
+	completeTask: completeTask,
+	updateTask: updateTask,
+	pullIncompleteTasks: pullIncompleteTasks,
+	Task: Task,
+	pullTasks: pullTasks
 }

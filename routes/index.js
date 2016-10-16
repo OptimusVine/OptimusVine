@@ -73,6 +73,7 @@ router.route('/productionRuns/status/:production')
 
 router.route('/works')
 	.get(workController.getWorks)
+	.post(workController.addWork)
 
 // PEOPLE
 
@@ -137,6 +138,8 @@ router.route('/todos/:todo/update')
 router.route('/todos/:todo/complete')
 	.get(todoController.completeToDo)
 
+router.route('/todos/pull/myTasks')
+	.get(todoController.getMyTasks)
 
 
 router.route('/todos/:todo/assign/:assignee')

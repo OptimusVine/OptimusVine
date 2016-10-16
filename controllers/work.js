@@ -2,26 +2,35 @@ var sLoc = __filename.substring(process.cwd().length,__filename.length);
 console.log("Calling : " + sLoc)
 
 var mongoose = require('mongoose');
+var Promise = require('bluebird')
 
 var Work = mongoose.model('Work') 
 
-exports.getWorks = function(req, res, next){
+var getWorks = function(req, res, next){
 	Work.find(function(err, Work){
 		res.json(Work)
 	})
 }
 
-exports.addWork = function(req, res, next){
-	p = {id: 1,
-		name: {
-			first: "Kjiel",
-			last: "Carlson"
-			}
+var addWork = function(req, res, next){
+	return new Promise(function(resolve, reject){
+		if(!req.work){
+			console.log("Nothing Here")
+			reject("Nothing Here")
+			} else {
+
+			var w = req.work
+			var work = new Work(w)
+
+			work.save(function(err, result){
+				res.send(result) // should either send or resolve
+				resolve(result); // not both
+			});
 		}
+	})	
+}
 
-	var work = new Work(p)
-
-	work.save(function(err, result){
-		res.json(result);
-	});
+module.exports = {
+	addWork: addWork,
+	getWorks: getWorks
 }

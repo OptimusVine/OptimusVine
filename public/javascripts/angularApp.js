@@ -146,6 +146,12 @@ app.factory('todos', ['$http', function($http){
 		})
 	}
 
+	o.refreshIncomplete = function(id){
+		return $http.get('/todos/incomplete/refresh').then(function(res){
+			return res.data;
+		})
+	}
+
 	o.complete = function(id){
 		return $http.get('/todos/' + id + '/complete').then(function(res){
 			return res.data;
@@ -208,8 +214,7 @@ app.factory('todo', ['$http', function($http){
   		$scope.test = "The world exists";
   		$scope.sites = sites.sites
   		if(site){$scope.site = site};
-
-  	}])
+}])
 
     app.controller('TodoCtrl', [
   	'$scope',
@@ -229,15 +234,16 @@ app.factory('todo', ['$http', function($http){
   		$scope.forAssignment = false;
   		$scope.newTodo = false;
 
-  		$scope.visible = true;
+  		$scope.showComplete = false;
 
   		$scope.reloadRoute = function() {
    			$state.reload();
-   			$scope.lastUpdate = false;
+   		//	$scope.lastUpdate = false;
+		//	$scope.lastRefresh = false;   
 		}
 
-  		$scope.changeVisibility = function(){
-  			$scope.visible = !$scope.visible
+  		$scope.changeShowComplete = function(){
+  			$scope.showComplete = !$scope.showComplete
   		}
 
   		$scope.addToDo = function(){
@@ -254,7 +260,11 @@ app.factory('todo', ['$http', function($http){
   			$scope.newTodo = false
   		}
 
-
+		$scope.refreshIncomplete = function(){
+			todos.refreshIncomplete().then(function(){
+				$scope.lastRefresh = Date.now()
+			})
+		}
 
   		$scope.startNewTodo = function(){
   			$scope.newTodo = true

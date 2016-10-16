@@ -4,7 +4,9 @@
 
  <script type="text/ng-template" id="/todos.html">
  <div style="margin-left:30px">
- 	This is a todos page
+This is the ToDos page : ***** 
+<span ng-show="lastRefresh" >Last Refresh: {{lastRefresh | date : 'MM-dd-yyyy'}} *****</span>
+<span ng-show="lastUpdate" >Last Update: {{lastUpdate | date : 'MM-dd-yyyy'}}</span><br>
 
  	<div ng-show="!newTodo">
  		Create a new ToDo here on <button ng-click="startNewTodo()">Click</button>, load up into Asana 
@@ -31,8 +33,8 @@
  	<br>
 
  	<div>
- 		<span ng-show="!visible"><button class="btn btn-default" ng-click="changeVisibility()">Show All</button></span>
- 		<span ng-show="visible"><button class="btn btn-default" ng-click="changeVisibility()">Hide Complete</button></span>
+ 		<span ng-show="!showComplete"><button class="btn btn-default" ng-click="changeShowComplete()">Show All</button></span>
+ 		<span ng-show="showComplete"><button class="btn btn-default" ng-click="changeShowComplete()">Hide Complete</button></span>
  	</div>
 
  	<div>
@@ -40,21 +42,28 @@
  		<span ng-show="lastUpdate"><button class="btn btn-default" ng-click="reloadRoute()">Downloaded - Please Refresh</button></span>
  	</div>
 
+	<div>
+ 		<span ng-show="!lastRefresh"><button class="btn btn-default" ng-click="refreshIncomplete()">Refresh Incomplete</button></span>
+ 		<span ng-show="lastRefresh"><button class="btn btn-default" ng-click="reloadRoute()">Downloaded - Please Refresh</button></span>
+ 	</div>
+
  	<div class="page-header">  
  		<div>
  			<table class="table table-hover">
  				<tr>
- 					<th>Name</th>
+ 					<th width="20%">Name</th>
  					<th>Asana ID</th>
+					<th>Assignee</th>
  					<th>Project</th>
  					<th>Due Date</th>
  					<th>Status</th>
  					<th>Details</th>
  				</tr>
 
- 				<tr ng-repeat="todo in todos | orderBy:'asana_id'" ng-show="!todo.complete || visible">
+ 				<tr ng-repeat="todo in todos | orderBy:'asana_id'" ng-show="!todo.complete || showComplete">
  					<td>{{todo.name}}</td>
  					<td>{{todo.asana_id}}</td>
+					<td>{{todo.asana_assignee.name}}</td>
  					<td>{{todo.projects[0].name}}</td>
  					<td>{{todo.dateDue | date : 'MM-dd-yyyy'}}</td>
  					<td>{{todo.complete}}</td>
