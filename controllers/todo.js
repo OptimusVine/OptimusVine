@@ -9,7 +9,12 @@ var asana = require('../middlewares/asana/tasks');
 
 var getTodos = function(req, res, next){
 	ToDo.find(function(err, todos){
-				res.json(todos)
+	/*	todos.forEach(function(t){
+			if(!t.projects[0]){
+				t.projects.push({name: "no project"})
+			}
+		})*/
+		res.json(todos)
 	})
 }
 

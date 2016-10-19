@@ -7,16 +7,26 @@ console.log("Calling : " + sLoc)
 var mongoose = require('mongoose');
 
 var People = mongoose.model('People') 
+var Webhook = mongoose.model('Webhook') 
 
 // SENDS all people currently in the database
-exports.getPeople = function(req, res, next){
+var getPeople = function(req, res, next){
 	People.find(function(err, people){
 		res.json(people)
 	})
 }
+
+var getPeopleWithSlack = function(req, res, next){
+	People.find({"slack.id":{"$exists":"true"}}, function(err, results){
+		res.json(results)
+	})
+}
+
+
+
 // Adds a new person to the database
 // CURRENTLY HARD CODED TO A SINGLE PERSON
-exports.addPerson = function(req, res, next){
+var addPerson = function(req, res, next){
 	p = {id: 1,
 		name: {
 			first: "Kjiel",
@@ -29,4 +39,32 @@ exports.addPerson = function(req, res, next){
 	person.save(function(err, result){
 		res.json(result);
 	});
+}
+
+var addUpdatePerson = function(p){
+// 	console.log(p)
+	if(!(p._id || p.slackId )){
+		console.log("There is no _id or slackId for the user to addUpdatePerson : Please build more functionality")
+	} else {
+			People.find({'slackId':p.slackId}, function(err, people){
+				if(people.length > 0){console.log(people.length + " people have been found")
+					if(people.length == 1){console.log(people[0])}
+					} else {
+						console.log("let add " + p.real_name)
+						var pNew = new People(p)
+						console.log(pNew)
+						pNew.save(function(err, result){
+							console.log(result)
+						})
+					}
+				
+			})
+	}
+}
+
+module.exports = {
+	addPerson: addPerson,
+	addUpdatePerson: addUpdatePerson,
+	getPeople: getPeople,
+	getPeopleWithSlack: getPeopleWithSlack
 }

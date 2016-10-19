@@ -20,6 +20,7 @@ var siteController = require('../controllers/sites')
 var workController = require('../controllers/work')
 var todoController = require('../controllers/todo')
 var wineController = require('../controllers/wine')
+var communicationController = require('../controllers/communication')
 
 router.get('/', function(req, res, next) {
   res.render('index');
@@ -32,6 +33,11 @@ router.get('/test', wineController.getAuth);
 // WORKFLOWS
 
 router.get('/workflows', wineController.getWorkflows)
+
+// COMMUNICATION
+router.route('/message/sendSlack')
+	.get(communicationController.sendMessageSlack)
+	.post(communicationController.postMessageSlack)
 
 // WORKSPACES
 
@@ -78,6 +84,7 @@ router.route('/works')
 // PEOPLE
 
 router.get('/people', peopleController.getPeople);
+router.get('/people/withSlack', peopleController.getPeopleWithSlack);
 router.route('/people/:person')
 	.get(function(req, res, next){
 		console.log(req.person)
@@ -117,7 +124,7 @@ router.route('/sites/:sites/date')
 // TODOS
 
 router.route('/todos')
-	.get(todoController.getTodos)
+	.get(todoController.getTodos) // Service Exists
 	.post(todoController.postTodos)
 router.get('/todos/pull', todoController.pullTodos)
 

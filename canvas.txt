@@ -1,0 +1,4 @@
+Create a custom text outlay, that if I select a tast, it will forward that task in the link
+
+Create a link to all of the options at an ADMIN PANEL, so I can then take the services and buttons 
+to different modules yet have all of the functions built 

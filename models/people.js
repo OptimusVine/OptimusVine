@@ -6,9 +6,17 @@ var mongoose = require('mongoose');
 var PeopleSchema = new mongoose.Schema({
 	id: {type: String},
 	name: {
+		slack: {type: String},
 		first: {type: String},
 		last: {type: String},
 		full: {type: String}
+	},
+	email: {type: String},
+	slackId: {type: String},
+	asana_assignee: {type: Number},
+	slack: {
+		slackId: {type: String},
+		webhook: {type: String}
 	}
 //	routes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Routes'}],
 
