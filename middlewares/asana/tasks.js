@@ -11,8 +11,8 @@ var model = require('../../models/todo')
 
 var ToDo = mongoose.model('ToDo')
 
-//var env = process.env.NODE_ENV
-var env = 'development'
+var env = process.env.NODE_ENV
+//var env = 'development'
 
 if(env == "development"){
 	var token = require('../../private/keys').asana.token
