@@ -1,7 +1,7 @@
 var sLoc = __filename.substring(process.cwd().length,__filename.length);
 console.log("Calling : " + sLoc)
 
-var Promise = require('Bluebird')
+var Promise = require('bluebird')
 
 var request = require('request')
 var events = require('events')
