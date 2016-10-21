@@ -7,7 +7,6 @@ var env = process.env.NODE_ENV
 
 if(env == 'development'){
 	var keys = require('../../private/keys') 
-	console.log(keys)
 	var token = keys.slack.token
 	var webhook = keys.slack.webhooks.kjiel
 } else {

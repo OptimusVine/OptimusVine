@@ -4,6 +4,7 @@ console.log("Calling : " + sLoc)
 var mongoose = require('mongoose');
 
 var ToDo = mongoose.model('ToDo')
+var People = mongoose.model('People')
 
 var asana = require('../middlewares/asana/tasks');
 
@@ -28,14 +29,44 @@ var getMyTasks = function(req, res, next){
 	})
 }
 
+var getAssignees = function(){
+	var q = {'asana_assignee.id':{$ne:null}}
+	ToDo.find(q, function(err, results){
+
+		console.log(results.length)
+		return results
+	}).then(function(results){
+		var arr = []
+		for(i=0;i<results.length;i++){
+			if (!results[i].asana_assignee) {
+				console.log("ERROR : No ASSIGNEE " + results[i].name)
+			}else if(results[i].asana_assignee.id == null){
+				console.log("NO ASSIGNEE!?!?!")
+				console.log(results[i])
+			} else {
+				if(arr.indexOf(results[i].asana_assignee.id) == -1){
+					arr.push(results[i].asana_assignee.id)
+				}
+			}
+		}
+	//	console.log(arr)
+		var q = {'asana_assignee':{$in: arr}}
+		People.find(q, function(err, results){
+			console.log(results)
+			return results
+		})
+	})
+}
+
 var postTodos = function(req, res, next){
 	if(!req.body.name){res.status(400).send('Something broke!');
 		} else {
-			//console.log("Body received: " + req.body)
+			console.log(req.body)
 			t = new ToDo(req.body)
-			if (!t.assignee){t.asana_assignee = {id: null}}
+			console.log(t)	
+			if (!t.asana_assignee){t.asana_assignee = {id: null}}
 			if (!t.summary){t.summary = ""}
-			console.log(t)		
+	
 			asana.createTask(t).then(function(data){
 				t.asana_id = data.id;
 				return(t)

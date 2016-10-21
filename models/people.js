@@ -20,7 +20,7 @@ var PeopleSchema = new mongoose.Schema({
 	}
 //	routes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Routes'}],
 
-	})
+	}) 
 
 PeopleSchema.methods.addPerson = function(err) {
 	if(this.save()){

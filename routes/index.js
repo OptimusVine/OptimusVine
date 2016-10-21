@@ -84,6 +84,7 @@ router.route('/works')
 // PEOPLE
 
 router.get('/people', peopleController.getPeople);
+router.get('/people/withAsana', peopleController.getPeopleWithAsana);
 router.get('/people/withSlack', peopleController.getPeopleWithSlack);
 router.route('/people/:person')
 	.get(function(req, res, next){

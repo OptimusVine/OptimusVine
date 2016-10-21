@@ -22,7 +22,11 @@ var getPeopleWithSlack = function(req, res, next){
 	})
 }
 
-
+var getPeopleWithAsana = function(req, res, next){
+	People.find({"asana_assignee":{$ne:null}}, function(err, results){
+		res.json(results)
+	})
+}
 
 // Adds a new person to the database
 // CURRENTLY HARD CODED TO A SINGLE PERSON
@@ -66,5 +70,6 @@ module.exports = {
 	addPerson: addPerson,
 	addUpdatePerson: addUpdatePerson,
 	getPeople: getPeople,
-	getPeopleWithSlack: getPeopleWithSlack
+	getPeopleWithSlack: getPeopleWithSlack,
+	getPeopleWithAsana: getPeopleWithAsana
 }

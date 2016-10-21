@@ -116,7 +116,7 @@ var pullTasksMyTasks = function(assignee){
 
 // Name, Summary and Assignee are sent via API and loaded into Asana
 // This should be returned to the controller to enter into the DB
-exports.createTask = function(task){
+var createTask = function(task){
 	options = {
 		"method":"POST",
     	"url": "https://app.asana.com/api/1.0/tasks",
@@ -252,6 +252,8 @@ var updateTask = function(t){
 	return new Promise(function(resolve, reject){ 
 		pullTask(t).then(function(todo){
 			resolve(todo)
+		}).catch(function(err){
+			console.log(err)
 		})
 	})
 }
@@ -330,6 +332,7 @@ var updateAsanaInDatabase = function(asanaResult){
 }
 
 module.exports = {
+	createTask: createTask,
 	pullWorkspaces: pullWorkspaces,
 	pullTasksMyTasks: pullTasksMyTasks,
 	processDownloadedTask: processDownloadedTask,

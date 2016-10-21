@@ -34,7 +34,7 @@ exports.getWorkflows = function(req, res, next){
 }
 
 exports.getWines = function(req, res, next){
-	Wine.find(function(err, wines){
+	Wine.find({type:"Wine"}, function(err, wines){
 		var count = wines.length
 		console.log(wines[0])
 
