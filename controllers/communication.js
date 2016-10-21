@@ -22,7 +22,7 @@ var postMessageSlack = function(req, res){
         webhooks.sendMessage(message, webhookBody.webhook).then(function(){
             console.log("sending response")
             res.status(200)
-            let body = JSON.stringify({"result":"Message Received"})
+            var body = JSON.stringify({"result":"Message Received"})
             res.send(body)
         }) 
     })
