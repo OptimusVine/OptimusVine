@@ -4,7 +4,12 @@ console.log("Calling : " + sLoc)
 
 var express = require('express');
 var router = express.Router();
+var passport = require('passport');
 
+var secret = "SECRET"
+var expressJWT = require('express-jwt')
+var jwt = require('jsonwebtoken')
+var auth = expressJWT({secret: secret}).unless({path: ['/']})
  
 var mongoose = require('mongoose')
 var Route = mongoose.model('Route')
@@ -26,6 +31,60 @@ router.get('/', function(req, res, next) {
   res.render('index');
 });
 
+// AUTHENTICATION
+
+var signup = function(req, res){
+	if(req.body){
+		passport.authenticate('local-signup', function(err, user){
+			req.user = user.local.email
+			console.log(req.user)
+			res.send(req.user)
+		})(req, res)
+	}
+}
+
+var login = function(req, res){
+	console.log(req.headers)
+	if(req.body){
+		passport.authenticate('local-login', function(err, user){
+			if(err){console.log(err)}
+			if(!user){res.status(401).json({status:"Not Found"})}
+			if(user){
+		//		console.log(user)
+				req.user = {'email': user.local.email}
+				req.logIn(user, function(err){
+					var myToken = jwt.sign(user,secret)
+		//			console.log(myToken)
+					res.status(200).json({status: 'Login Successful', token: myToken, email: req.user})
+				})
+			}
+		})(req, res)
+	}
+}
+
+router.route('/signup')
+	.post(signup);
+
+
+router.route('/login')
+	.post(login);
+
+
+router.route('/user')
+	.get(function (req, res){
+	console.log(req.body)
+	if(!req.user){ console.log({user: "No User"}), res.send({user: "No User"})}
+	else {
+		console.log(req.user)
+		res.send(req.user)
+		}
+	})
+	.post(function(){
+		console.log("Made it to USER!")
+	})
+
+
+
 // TESTS
 
 router.get('/test', wineController.getAuth);
@@ -33,7 +92,7 @@ router.get('/test', wineController.getAuth);
 // WORKFLOWS
 
 router.get('/workflows', wineController.getWorkflows)
-
+ 
 // COMMUNICATION
 router.route('/message/sendSlack')
 	.get(communicationController.sendMessageSlack)
@@ -125,7 +184,7 @@ router.route('/sites/:sites/date')
 // TODOS
 
 router.route('/todos')
-	.get(todoController.getTodos) // Service Exists
+	.get(auth, todoController.getTodos) // Service Exists
 	.post(todoController.postTodos)
 router.get('/todos/pull', todoController.pullTodos)
 
