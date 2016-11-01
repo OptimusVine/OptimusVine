@@ -14,7 +14,7 @@ var ToDo = mongoose.model('ToDo')
 var env = process.env.NODE_ENV
 //var env = 'development'
 
-if(env == "development"){
+if(env == "development" || "test"){
 	var token = require('../../private/keys').asana.token
 } else {
 	var token = process.env.asana_token_kjiel
@@ -81,11 +81,11 @@ var pullIncompleteTasks = function(projectId){
 	    }
 	}
 
-	console.log("Pulling Incomplete Tasks for : " + projectId)
+//	console.log("Pulling Incomplete Tasks for : " + projectId)
 	return new Promise(function(resolve, reject){
 		request(options, function(err, response){
 			if(err){console.log(err)}
-		//	console.log(response.body.data)
+	//		console.log(response.body.data)
 			resolve(response.body.data)
 		})
 	})
@@ -221,6 +221,9 @@ var processDownloadedTask = function(asanaRecord){
 						.then(function(todo){
 						//	console.log(todo)
 							resolve(todo)
+						}).catch(function(err){
+							console.log(err)
+							resolve(todo)
 						})
 						/*
 						.catch(function(err){
@@ -267,15 +270,21 @@ var pullTask = function(t){
 					console.log(err)
 					reject(err)
 				} else if(response.statusCode !=200 ) {
-					console.log('Response Status Code: ' + response.statusCode)
-					reject(new Error("Bad Status Code"))
+					console.log(' ****** \n Response Status Code: ' + response.statusCode + " on " + t.name)
+					if(response.statusCode == 404){
+						t.action = {needed: true, description: "Possibly Missing, 404 Found"}
+						t.save(function(){
+							console.log(" ****** \n SAVED \n ******")
+						})
+					}
+					reject(" ****** \n Bad Status Code \n ******")
 				} else {
 			//		console.log('Status Code: ' + response.statusCode)
 					var data = JSON.parse(response.body).data;
 				//	console.log(data)
-					console.log("Preparing up update task to DB")
+			//		console.log("Preparing up update task to DB")
 					updateAsanaInDatabase(data).then(function(todo){
-						console.log("I have updated the task in the DB")
+					//	console.log("I have updated the task in the DB")
 						resolve(todo)
 					}).catch(function(err){
 						console.log("Is the issue here?")
@@ -296,11 +305,20 @@ var completeTask = function(req){
 	}
 	return new Promise(function(resolve){
 		request(options, function(err, response){
-			d = response.body.data
-	//		console.log(d)
-			updateAsanaInDatabase(d).then(function(todo){
+			if(err){console.log(err); res.send("Error Received")}
+			if(response.statusCode == 201 || response.statusCode == 200){
+				d = response.body.data	
+				console.log(d)
+				updateAsanaInDatabase(d).then(function(todo){
 				resolve(todo)
 			})
+			} else {
+				d = req.todo
+				d.complete = true
+				d.save(function(err, result){
+					resolve(result)
+				})
+			}
 		})
 	})
 }
@@ -308,6 +326,7 @@ var completeTask = function(req){
 
 // Load full data pulled from the API into the DB
 var updateAsanaInDatabase = function(asanaResult){
+//	console.log(asanaResult)
 	return new Promise(function(resolve){
 		if(asanaResult.id){
 			conditions = { 'asana_id': asanaResult.id};
@@ -319,6 +338,7 @@ var updateAsanaInDatabase = function(asanaResult){
 						asana_assignee: asanaResult.assignee,
 						projects: asanaResult.projects
 					};
+			console.log(conditions)
 			query = ToDo.findOneAndUpdate(conditions, update)
 			query.exec(function(err,todo){
 		//		console.log(todo._id + " has been updated from Asana")

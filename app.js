@@ -34,7 +34,7 @@ var models = require('./models/index')
 
 var routes = require('./routes/index');
 
-var helpers = require('./helpers/index')
+// var helpers = require('./helpers/index')
 
 var app = express();
 

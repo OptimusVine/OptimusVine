@@ -10,7 +10,7 @@ var Workspace = mongoose.model('Workspace')
 var Sourcing = mongoose.model('Sourcing')
 var Wine = mongoose.model('Item')
 var Production = mongoose.model('Production')
-var Workflow = mongoose.model('Workflow')
+var Process = mongoose.model('Process')
 
 var setOptions = function(target){
 	o = {

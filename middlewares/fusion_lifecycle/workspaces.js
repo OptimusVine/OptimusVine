@@ -12,6 +12,8 @@ var Wine = mongoose.model('ToDo')
 var Production = mongoose.model('Production')
 var Item = mongoose.model('Item')
 
+var processController = require('../../controllers/process')
+
 var listOfWorkspaces = [92, // Sourcing
 						98, 
 						93]
@@ -39,7 +41,7 @@ exports.getItems = function(id){
 	Workspace.find({"id":id}, function(err, res){
 		o = {
     "method":"GET",
-    "url": res[0].uri,
+    "url": res[0].uri + "?page=1&size=100",
     "headers": {
         "Accept": "application/json"
     ,   "Cookie": auth.Cookie()
@@ -47,12 +49,19 @@ exports.getItems = function(id){
  //    	console.log(o) 
     	request(o ,function(err, response){
     		if(err){console.log(err)}
-    		else if(response.statusCode ==500){console.log("Error 500 - Possible AUTH issue")}
+    		else if(response.statusCode ==500){
+				console.log("Error 500 - Possible AUTH issue - please try again")
+				auth.getAuth()
+				reject()
+		}
     		else{
 			   	//  console.log("Request Received")
 			   	var resBody = JSON.parse(response.body)
-			   		console.log(resBody.list.item[0].details)
+				   console.log(resBody)
+			   	//	console.log(resBody.list.item[0].details)
+				   	console.log(resBody.list.item.length)
 	    			processDownloadedItems(resBody.list.item, id)
+					resolve()
     			}
     		})
 		})
@@ -87,6 +96,9 @@ var updateItemToDatabase = function(item){
 			//	console.log(res)
 				console.log("Id " + item.id + " Already exists")
 			} else if (!res){
+			} else if (item.details.deleted == true){
+				console.log("Deleted them, doing nothing. ")
+				// If deleted, do nothing
 			} else {
 			//	console.log(res)
 				s = new Item(item)
@@ -95,7 +107,7 @@ var updateItemToDatabase = function(item){
 			//	console.log(s)
 				s.save(function(err, result){
 				//	console.log(result)
-					console.log(result.type + " obj saved: " + result.id)
+					console.log(result.type + " obj saved: " + result.id + " deleted : " + result.plmItem.details.deleted)
 				})
 			}
 		})

@@ -6,7 +6,7 @@ var mongoose = require('mongoose')
 
 var env = process.env.NODE_ENV
 
-if(env == "development"){
+if(env == "development" || "test"){
 	var keys = require('../../private/keys')
 	var userId = keys.autodesk.userId
 	var password = keys.autodesk.password
@@ -22,7 +22,7 @@ var password = keys.autodesk.password
 */
 
 var sessionid = "";
-var cookieString = "";
+var cookieString = " empty ";
 var workspaces;
 
 options = {}
@@ -36,7 +36,7 @@ var param = {
 		"password": password
 }
 
-exports.Cookie = function(){
+var Cookie = function(){
 	if (cookieString.length > 2){
 		return cookieString
 	} else {
@@ -50,10 +50,13 @@ var getAuth = function(){
 	request.post('https://clubw.autodeskplm360.net/rest/auth/1/login', {form: param}, function(err, response){
 		if(err){
 			console.log("Error attempting to reach PLM for Authentication")
-		} else {
+		} else if(JSON.parse(response.body).authStatus){
+			console.log(JSON.parse(response.body).authStatus)
+			return
+		}  else {
 		//	console.log(response)
 			var resBody = JSON.parse(response.body);
-		//	console.log(resBody)
+			console.log(resBody)
 			sessionid = resBody.sessionid;
 			cookieString = "customer=CLUBW;JSESSIONID=" + sessionid.toString();
 		//	console.log(cookieString + " is our Auth Key!");
@@ -92,3 +95,7 @@ var setOptionsWorkspace = function(){
 
 getAuth();
 
+module.exports = {
+	getAuth: getAuth,
+	Cookie: Cookie
+}

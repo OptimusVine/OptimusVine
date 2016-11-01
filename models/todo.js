@@ -5,6 +5,7 @@ var mongoose = require('mongoose');
 
 var ToDoSchema = new mongoose.Schema({
 	name: {type: String, required: true},
+	action: {needed: Boolean, description: String},
 	summary: {type: String},
 	dateAdded: {type: Date}, // Set default to "NOW"
 	dateLastUpdate: {type: Date},

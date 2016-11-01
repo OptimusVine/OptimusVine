@@ -9,42 +9,44 @@ var FLitem = require('../middlewares/fusion_lifecycle/item')
 var Wine = mongoose.model('Item') 
 var Sourcing = mongoose.model('Sourcing') 
 var Production = mongoose.model('Production') 
-var Workflow = mongoose.model('Workflow') 
+var Process = mongoose.model('Process') 
 var Workspace = mongoose.model('Workspace') 
 var Item = mongoose.model('Item') 
 
-exports.getProductionWorkflowHistory = function(req, res, next){
+var processController = require('./process')
+
+var getProductionWorkflowHistory = function(req, res, next){
 	FLitem.getProductionWorkflowHistory(req, res)
 }
 
-exports.getItemWorkflowHistory = function(req, res, next){
+var getItemWorkflowHistory = function(req, res, next){
 	FLitem.getItemWorkflowHistory(req, res)
 }
 
-exports.getWorkspaces = function(req, res, next){
+var getWorkspaces = function(req, res, next){
 	Workspace.find(function(err, workspaces){
 		res.send(workspaces)
 	})
 }
 
-exports.getWorkflows = function(req, res, next){
-	Workflow.find(function(err, workflows){
+var getProcesses = function(req, res, next){
+	Process.find().populate("workspace").exec(function(err, workflows){
 		res.send(workflows)
 	})
 }
 
-exports.getWines = function(req, res, next){
+var getWines = function(req, res, next){
 	Wine.find({type:"Wine"}, function(err, wines){
 		var count = wines.length
-		console.log(wines[0])
-
-		console.log("There are more objects, only printing ONE")
+	//	console.log(wines[0])
+		processController.updateProcessCounts()
+	//	console.log("There are more objects, only printing ONE")
 		res.json(wines)
 	})
 }
 
-exports.getSourcing = function(req, res){
-	Sourcing.find(function(err, sourcings){
+var getSourcing = function(req, res){
+	Wine.find({type:"Sourcing"}, function(err, sourcings){
 		var count = sourcings.length
 		console.log(sourcings[0].plmItem.details)
 
@@ -53,7 +55,7 @@ exports.getSourcing = function(req, res){
 	})
 }
 
-exports.getProductionRuns = function(req, res){
+var getProductionRuns = function(req, res){
 	Production.find(function(err, sourcings){
 		var count = sourcings.length
 		console.log(sourcings[0].plmItem.details)
@@ -63,7 +65,7 @@ exports.getProductionRuns = function(req, res){
 	})
 }
 
-exports.showProductionRunsStatus = function(req, res){
+var showProductionRunsStatus = function(req, res){
 	Item.find({"type":"Production Run"},function(err, productions){
 		findStateStatus(productions).then(function(statuses){
 			res.send(statuses)
@@ -73,7 +75,7 @@ exports.showProductionRunsStatus = function(req, res){
 	})
 }
 
-exports.showSourcingStatus = function(req, res){
+var showSourcingStatus = function(req, res){
 	Item.find({"type":"Sourcing"},function(err, sourcings){
 		findStateStatus(sourcings).then(function(statuses){
 			res.send(statuses)
@@ -122,19 +124,21 @@ var findStateStatus = function(items){
 
 var checkState = function(item){
 //	console.log(item.plmItem.details)
-	Workflow.find({"stateId":item.plmItem.details.workflowState.stateId}, function(err, results){
+	Process.find({"stateId":item.plmItem.details.workflowState.stateId}, function(err, results){
 		if(err){
 			} else if (results.length>0){
 			//	console.log(results)
+			console.log("No Workflow State matching this ID : " +  item.plmItem.details.workflowState.stateI)
 			} else {
 				Workspace.find({"id":item.plmItem.details.workspaceID}, function(err, res){
 				//	console.log(res)
 					var o = {
 					stateName: item.plmItem.details.workflowState.stateName,
 					stateId: item.plmItem.details.workflowState.stateId,
-					workspace: res[0]
+					workspace: res[0],
+					type: res[0].label,
 				}
-					var w = new Workflow(o)
+					var w = new Process(o)
 					w.save(function(err, res){
 					console.log("saved workflow named: " + res.stateName + " for Workspace : " + res.workspace.name)
 					console.log(res)
@@ -145,7 +149,7 @@ var checkState = function(item){
 	})
 }
 
-exports.showWinesStatus = function(req, res){
+var showWinesStatus = function(req, res){
 	Item.find({"type":"Wine"},function(err, wines){
 		findStateStatus(wines).then(function(statuses){
 			res.send(statuses)
@@ -155,23 +159,25 @@ exports.showWinesStatus = function(req, res){
 	})
 }
 
-exports.refreshSourcing = function(req, res){
+var refreshSourcing = function(req, res){
 	FL.getItems(92)
 }
 
-exports.refreshWines = function(req, res){
-	FL.getItems(98)
+var refreshWines = function(req, res){
+	FL.getItems(98).then(function(r){
+		res.json({message:"I built this lazy, pull wines in a minutes"})
+	})
 }
 
-exports.refreshProductionRuns = function(req, res){
+var refreshProductionRuns = function(req, res){
 	FL.getItems(93)
 }
 
-exports.getAuth = function(req, res){
+var getAuth = function(req, res){
 	FL.getItems(92)
 }
 
-exports.addWine = function(req, res, next){
+var addWine = function(req, res, next){
 	p = {
 		id: 1,
 		name: "Kjiel"
@@ -182,4 +188,22 @@ exports.addWine = function(req, res, next){
 	wine.save(function(err, result){
 		res.json(result);
 	});
+}
+
+module.exports = {
+	addWine: addWine,
+	getAuth: getAuth,
+	getSourcing: getSourcing,
+	getItemWorkflowHistory: getItemWorkflowHistory,
+	getProductionRuns: getProductionRuns,
+	getProductionWorkflowHistory: getProductionWorkflowHistory,
+	getWines: getWines,
+	getProcesses: getProcesses,
+	getWorkspaces: getWorkspaces,
+	refreshProductionRuns: refreshProductionRuns,
+	refreshSourcing: refreshSourcing,
+	refreshWines: refreshWines,
+	showWinesStatus, showWinesStatus,
+	showSourcingStatus, showSourcingStatus,
+	showProductionRunsStatus, showProductionRunsStatus,
 }

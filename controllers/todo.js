@@ -91,20 +91,22 @@ var completeToDo = function(req, res, next){
 // calls a function in the asana file to grab project list one by one
 var pullIncompleteTasks = function(req, res){
 	projects = [159790025348212, 168506215476292, 88419022206391]
+	res.json({message:"Starting Task Download", count: projects.length, projects: projects})
 	projectCount = 0
 	resultCount = 0
 	results = []
 	forPush = []
-
+	console.log("*** Pulling tasks for " + projects.length + " projects ***")
 	for(i=0;i<projects.length;i++){
 		asana.pullIncompleteTasks(projects[i]).then(function(tasks){
-			console.log("Tasks Length: " + tasks.length)
+
 			for(j=0;j<tasks.length;j++){
 				results.push(tasks[j])
 			}
 		}).then(function(){
 			projectCount++
 			if(projectCount == projects.length){
+				
 			//	console.log("They are equal")
 				for(k=0;k<results.length;k++){
 					var r = results[k]
@@ -115,7 +117,7 @@ var pullIncompleteTasks = function(req, res){
 						if (results.length == resultCount){
 						//	console.log(forPush)
 							console.log(resultCount + " turned into " + forPush.length)
-							res.send(forPush)
+					//		res.send(forPush)
 						}
 					}).catch(function(err){
 					//	console.log(err)
@@ -123,7 +125,7 @@ var pullIncompleteTasks = function(req, res){
 						if (results.length == resultCount){
 						//	console.log(forPush)
 							console.log(resultCount + " turned into " + forPush.length)
-							res.send(forPush)
+					//		res.send(forPush)
 						}
 					})
 				}

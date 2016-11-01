@@ -47,6 +47,10 @@ Purchases
 	Payment
 		Check
 
+Process
+	Workflows
+	Rules
+
 Systems
 	PLM
 		Sourcing

@@ -1,4 +1,21 @@
-Create a custom text outlay, that if I select a tast, it will forward that task in the link
+Create a "search" where I can start typing in a wine and it will provide me the list, shrink down so that I can pull
+    the details tab and have the URL directly to the item.
+
+
+Get the Count of each process via the DB and return in the GET /processes
+    Then be able to jump to each bucket to see each item
+    Jumping to the bucket does a pull of all items to create a quick dashboard
+
+Load data OnInit of a component, when I route to it vs needing a hard reload
+
+Bring in BOM / related production runs / Grid to PLM
+
+Create a UI for setting Workflow Precidents and Secessors + "SameSame"
+    Can only be a successor or a Precidents
+    Need to create an area for "SameSame", work has to be done by someone else, but in same area
+
+ Processes
+    Numerous processes can be in the same bucket ("Office"), and has a sub workflow tracking to it
 
 Create a link to all of the options at an ADMIN PANEL, so I can then take the services and buttons 
 to different modules yet have all of the functions built 
