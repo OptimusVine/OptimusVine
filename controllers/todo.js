@@ -90,7 +90,7 @@ var completeToDo = function(req, res, next){
 // Pulls all incomplete tasks based on the hardcoded list
 // calls a function in the asana file to grab project list one by one
 var pullIncompleteTasks = function(req, res){
-	projects = [159790025348212, 168506215476292, 88419022206391]
+	projects = [159790025348212, 168506215476292, 88419022206391, 205804092915017]
 	res.json({message:"Starting Task Download", count: projects.length, projects: projects})
 	projectCount = 0
 	resultCount = 0
@@ -136,26 +136,39 @@ var pullIncompleteTasks = function(req, res){
 	}	
 }
 
+var getTodoStories = function(req, res){
+	asana.getStories(req).then(function(stories){
+		var comments = []
+		for(i=0;i<stories.length;i++){
+			if(stories[i].type == 'comment'){
+				comments.push(stories[i])
+			}
+		}
+		res.send(comments)
+	})
+}
+
 // When called, pull an update on all tasks showing incomplete in DB
 // Goes Tasks by Task, pulling the update from Asana, updating to DB
 // At end, returns all tasks in Response
 var updateIncompleteTasks = function(req, res){
 	var list = []
 	ToDo.find({"complete":false}, function(err, results){
+		console.log(results.length + " items found as incomplete, preparing to update")
 		for(i=0;i<results.length;i++){
 		//	console.log(results)
 			asana.updateTask(results[i]).then(function(result){
 				list.push(result)
-				console.log(result.name + " is currently : " + result.complete)
+		//		console.log(result.name + " is currently : " + result.complete)
 				if(list.length == results.length){
-					console.log("Full")
-					console.log(list)
+		//			console.log("Full")
+					console.log(list.length + " items updated, sending respose")
 					res.send(list)
 				}
 			})
 		}
 	})	
-}
+ }
 
 
 var pullTodos = function(req, res){
@@ -197,6 +210,7 @@ var processDownloadedTask = function(tasks){
 }
 
 module.exports = {
+	getTodoStories: getTodoStories,
 	todoPutByIdAssign: todoPutByIdAssign,
 	pullFullTask: pullFullTask,
 	pullTodos: pullTodos,

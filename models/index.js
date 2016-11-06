@@ -5,9 +5,11 @@ console.log("Calling : " + sLoc)
 // It is called from the main app.js page to load all of the models into Mongoose
 
 var item = require('./items.js')
+var order = require('./orders.js')
 var people = require('./people.js')
 var production = require('./production.js')
 var route = require('./route.js')
+var service = require('./service.js')
 var site = require('./site.js')
 var sourcing = require('./sourcing.js')
 var todo = require('./todo.js')

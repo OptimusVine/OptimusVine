@@ -7,12 +7,16 @@ var WorkSchema = new mongoose.Schema({
 	id: {type: String},
 	title: {type: String, required: true},
 	description: {type: String},
-	todos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Todo'}],
-	slack: {
+	todos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'ToDo'}],
+	services: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Service'}],
+	orders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order'}],
+	routes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Route'}],
+	communication:{
+		slack: {
 		channel: {type: String},
-		people: [{type: String}],
+		people: [{ type: mongoose.Schema.Types.ObjectId, ref: 'People'}],
 		webhook: {type: String}
-	},
+	}},
 	items: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Item'}]
 	})
 

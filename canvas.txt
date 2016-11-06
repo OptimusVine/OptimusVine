@@ -1,10 +1,14 @@
+Stop what you're doing right now.
+
+Create a single page where you can do and see all of Your work
+START WITH ALL WORK, then begin to filter is down
+USE THE RULES YOU LIVE BY
+
+
 Create a "search" where I can start typing in a wine and it will provide me the list, shrink down so that I can pull
     the details tab and have the URL directly to the item.
 
 
-Get the Count of each process via the DB and return in the GET /processes
-    Then be able to jump to each bucket to see each item
-    Jumping to the bucket does a pull of all items to create a quick dashboard
 
 Load data OnInit of a component, when I route to it vs needing a hard reload
 
@@ -19,3 +23,18 @@ Create a UI for setting Workflow Precidents and Secessors + "SameSame"
 
 Create a link to all of the options at an ADMIN PANEL, so I can then take the services and buttons 
 to different modules yet have all of the functions built 
+
+I want to be able to see all of my work 
+
+What defines your "Work"?
+
+1. Any TODO that is assigned to me
+2. Any Item that is in a status I care about
+3. Any Item that matches a "Rule" I setting
+
+1. How do I know if a Todo is assigned to you?
+2. 
+3. 
+
+1. Each Todo has an assignee. Each user of the system should have an ID number. If the number matches that number, its me!
+

@@ -16,7 +16,8 @@ var processController = require('../../controllers/process')
 
 var listOfWorkspaces = [92, // Sourcing
 						98, 
-						93]
+						93,
+						118]
 
 var workspaceMapping = [];
 
@@ -38,17 +39,16 @@ var setOptions = function(target){
 // Pull items by WorkspaceID from PLM
 exports.getItems = function(id){
 	return new Promise(function(resolve, reject){
-	Workspace.find({"id":id}, function(err, res){
-		o = {
-    "method":"GET",
-    "url": res[0].uri + "?page=1&size=100",
-    "headers": {
-        "Accept": "application/json"
-    ,   "Cookie": auth.Cookie()
-    	}}
- //    	console.log(o) 
+	var o = {
+   		"method":"GET",
+    	"url": "https://clubw.autodeskplm360.net/api/rest/v1/workspaces/" + id + "/items?page=1&size=100",
+   		"headers": {
+     		   "Accept": "application/json",
+     		   "Cookie": auth.Cookie()
+    		}}
+    //	console.log(o) 
     	request(o ,function(err, response){
-    		if(err){console.log(err)}
+    		if(err){console.log("Error Attempting to reaching Workspace : " + id), reject()}
     		else if(response.statusCode ==500){
 				console.log("Error 500 - Possible AUTH issue - please try again")
 				auth.getAuth()
@@ -64,7 +64,6 @@ exports.getItems = function(id){
 					resolve()
     			}
     		})
-		})
 	})
 }
 
@@ -88,13 +87,19 @@ var updateItemToDatabase = function(item){
 	for(k=0;k<workspaceMapping.length;k++){
 			if (workspaceMapping[k].id === item.details.workspaceID) {
 				type = workspaceMapping[k].label
-			};
+			} 
 		}
 
+		
 	Item.find({"id":item.id, "type": type}, function(err, res){
 			if(res.length > 0 ){
 			//	console.log(res)
-				console.log("Id " + item.id + " Already exists")
+				console.log("Item with DMS " + item.id + " Already exists : Preparing to update")
+				res[0].plmItem = item
+				res[0].save(function(err, result){
+					console.log(result.type + " obj saved: " + result.id + " deleted : " + result.plmItem.details.deleted)
+					console.log(result.plmItem.details.workflowState)
+				})
 			} else if (!res){
 			} else if (item.details.deleted == true){
 				console.log("Deleted them, doing nothing. ")
@@ -140,7 +145,7 @@ exports.getWorkspaces = function(){
 
 // Pulls a list of all workspaces in PLM
 // 		Then calls a different function to process them in
-exports.receiveWorkspaces = function(cookieString){
+exports.receiveWorkspaces = function(){
 	console.log(' : Requesting PLM workspaces \n -------------------------')
 	// Define URL via setOptions
 	var o = setOptions("workspaces")

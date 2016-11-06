@@ -22,9 +22,4 @@ var PeopleSchema = new mongoose.Schema({
 
 	}) 
 
-PeopleSchema.methods.addPerson = function(err) {
-	if(this.save()){
-	console.log('I saved a person named ' + this.name.full);
-}}
-
 mongoose.model('People', PeopleSchema);

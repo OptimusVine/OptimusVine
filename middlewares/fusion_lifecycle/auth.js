@@ -50,19 +50,15 @@ var getAuth = function(){
 	request.post('https://clubw.autodeskplm360.net/rest/auth/1/login', {form: param}, function(err, response){
 		if(err){
 			console.log("Error attempting to reach PLM for Authentication")
-		} else if(JSON.parse(response.body).authStatus){
-			console.log(JSON.parse(response.body).authStatus)
-			return
-		}  else {
+		} else {
 		//	console.log(response)
 			var resBody = JSON.parse(response.body);
-			console.log(resBody)
 			sessionid = resBody.sessionid;
 			cookieString = "customer=CLUBW;JSESSIONID=" + sessionid.toString();
 		//	console.log(cookieString + " is our Auth Key!");
 			setOptions("", cookieString)
 		//	console.log(options)
-			console.log(" \n -- PLM Authentication: " + cookieString + "\n")
+			console.log(" **** \nPLM Authentication: " + cookieString + "\n **** ")
 			return;
 		}
 	}) 
@@ -92,8 +88,6 @@ var setOptionsWorkspace = function(){
     }}
 	return options
 }
-
-getAuth();
 
 module.exports = {
 	getAuth: getAuth,

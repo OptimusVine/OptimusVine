@@ -9,6 +9,19 @@ var mongoose = require('mongoose');
 var People = mongoose.model('People') 
 var Webhook = mongoose.model('Webhook') 
 
+var getWebhooks = function(req, res){
+    Webhook.find(function(err, w){
+        res.send(w)
+    })
+}
+
+var postWebhooks = function(req, res){
+    var w = new Webhook(req.body)
+    w.save(function(err, result){
+        res.send(result)
+    })
+}
+
 var sendMessageSlack = function(req, res){
     var text = "This has been sent via Angular2 App"
     webhooks.sendMessage(text)
@@ -37,6 +50,8 @@ var getWebhook = function(slackId){
 }
 
 module.exports = {
-    sendMessageSlack: sendMessageSlack,
-    postMessageSlack: postMessageSlack
+    getWebhooks: getWebhooks,
+    postMessageSlack: postMessageSlack,
+    postWebhooks: postWebhooks,
+    sendMessageSlack: sendMessageSlack,   
 }

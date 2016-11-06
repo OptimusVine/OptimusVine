@@ -19,6 +19,8 @@ var Work = mongoose.model('Work')
 // Process.collection.drop()
 // Production.collection.drop()
 
+var work = require('./helpers/work')
+
 var newWine = new Item({
             type: 'Wine',
             description: 'Optimus Vine',
@@ -37,11 +39,6 @@ var newWork = new Work({
            title: "Work Title",
            description: "Work Descripton",          
         })
-        if(vItem){
-            newWork.items.push(vItem)
-        } else {
-            console.log("NO ITEM TO PUSH")
-        }
         newWork.save(function(err, work){
     })
 

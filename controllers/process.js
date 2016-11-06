@@ -116,13 +116,17 @@ var updateProcessCounts = function(){
     Item.find(function(err, items){
         Process.find().populate("children").populate("workspace").exec(function(err, processes){
             for(i=0; i<processes.length; i++){
-                processes[i].count = 0
+                processes[i].count = 0 // Resets the count of all existing processes to 0
             }
             for(i=0; i<items.length;i++){
-                var state = items[i].plmItem.details.workflowState.stateName
-        //        console.log(state)
-                var pos = processes.map(function(e) { return e.stateName; }).indexOf(state);
-                processes[pos].count++
+                var state = items[i].plmItem.details.workflowState
+                var pos = processes.map(function(e) { return e.stateName; }).indexOf(state.stateName);
+                if(pos > -1){ // If that processes exists currnetly
+                    processes[pos].count++ // Add to its count
+                } else { // If that process doesn't currently exist'
+                    processes.push(state)
+                    addProcess(items[i])
+                }
             }
             for(i=0; i<processes.length; i++){
                 processes[i].countChildren = 0
@@ -134,6 +138,12 @@ var updateProcessCounts = function(){
            })
         })
     })
+}
+
+var addProcess = function(item){
+    var n = new Process(item.plmItem.details.workflowState)
+    n.type = item.type
+    n.save()
 }
 
 var getOptions = function(req, res, next){

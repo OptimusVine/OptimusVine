@@ -4,9 +4,8 @@ Home page will have a link to Sites, Routes, Todos
 
 
 People
-	Employees
-		Technicains
-	Customers
+PLACES
+Items
 
 Work
 	ToDos
@@ -17,9 +16,20 @@ Work
 			: Link to Stuff
 			: Link to Sites
 			: Link to Routes
-	Workorders
-	Orders
+	Service (PEOPLE required)
+	Orders (ITEMS required)
+	Routes (PLACES required)
+	Items
+	Communications // Who needs to be in the loop, how to keep them in the loop
 
+People
+	Employees
+		Technicains
+	Customers
+	Users
+
+Places
+/// NEED TO REPLACE SITES WITH PLACES
 Sites
 	Warehouses
 		Bins
@@ -31,31 +41,32 @@ Routes
 		One-Time
 		Regular
 
-Items
+Items / Things
 	Products
 		Chemicals
 		Parts
-		Wine
-
-Purchases
-	Request
-		Approval
-	Schedule
-	Delivery
-	Receipt
-	Bill
-	Payment
-		Check
+		wine
 
 Process
 	Workflows
 	Rules
+	Purchases
+		Request
+		Approval
+		Schedule
+		Delivery
+		Receipt
+		Bill
+		Payment
+		Check
+
 
 Systems
 	PLM
 		Sourcing
 		wine
 		Production Runs
-	NetSuite
+	NetSuite // NOT YET OPERATIONAL
+	Slack
 	Asana
 		: Create new Todo from /Todos 

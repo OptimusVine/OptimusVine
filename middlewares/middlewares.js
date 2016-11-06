@@ -1,0 +1,1 @@
+require('./fusion_lifecycle/auth').getAuth()

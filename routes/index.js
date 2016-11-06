@@ -19,7 +19,9 @@ var Todo = mongoose.model('ToDo')
 var Item = mongoose.model('Item')
 var Process = mongoose.model('Process')
 var Production = mongoose.model('Production')
+var Work = mongoose.model('Work')
 
+var adminController = require('../controllers/admin')
 var itemController = require('../controllers/item')
 var peopleController = require('../controllers/people')
 var processController = require('../controllers/process')
@@ -35,7 +37,6 @@ router.get('/', function(req, res, next) {
 });
 
 // AUTHENTICATION
-
 var signup = function(req, res){
 	if(req.body){
 		passport.authenticate('local-signup', function(err, user){
@@ -44,7 +45,7 @@ var signup = function(req, res){
 			res.send(req.user)
 		})(req, res)
 	}
-}
+ }
 
 var login = function(req, res){
 	console.log(req.headers)
@@ -63,7 +64,7 @@ var login = function(req, res){
 			}
 		})(req, res)
 	}
-}
+ }
 
 router.route('/signup')
 	.post(signup);
@@ -87,55 +88,50 @@ router.route('/user')
 	})
 
 
+// ADMIN
+router.route('/admin/reloadData')
+	.get(adminController.reloadData)
+
+
+
 
 // TESTS
 
 router.get('/test', wineController.getAuth);
 
-// WORKFLOWS
 
-router.route('/processes')
-	.get(processController.getProcesses)
-	.post(processController.postProcess)
-router.route('/processes/options')
-	.get(processController.getOptions)
-router.route('/processes/counts')
-	.get(processController.getCounts)
-router.route('/processes/:process')
-	.get(processController.getProcessItems)
 
  
 // COMMUNICATION
+router.route('/comm/webhooks')
+	.get(communicationController.getWebhooks)
+	.post(communicationController.postWebhooks)
 router.route('/message/sendSlack')
 	.get(communicationController.sendMessageSlack)
 	.post(communicationController.postMessageSlack)
 
 // WORKSPACES
 
-router.get('/workspaces', wineController.getWorkspaces)
+router.route('/workspaces')
+	.get(wineController.getWorkspaces)
+router.route('/workspaces/update')
+	.get(itemController.updateWorkspaces)
 
 
 
 
 // ITEMS
-
+router.route('/items')
+	.get(itemController.getItems)
 router.route('/items/:type')
 	.get(itemController.getItemsByType)
+router.route('/items/:type/examine')
+	.get(itemController.examineItems)
+router.route('/items/:type/pull')
+	.get(itemController.pullFromPLMbyType)
 router.route('/items/:type/:item')
 	.get(itemController.getItemById)
 
-
-// WINES 
-// TODO: DEPRECIATE WINES --- TRANSITION TO ITEMS
-
-router.route('/wines')
-	.get(wineController.getWines)
-router.route('/wines/refresh')
-	.get(wineController.refreshWines)
-router.route('/wines/status')
-	.get(wineController.showWinesStatus)
-router.route('/wines/status/:item')
-	.get(wineController.getItemWorkflowHistory)
 
 // SOURCING
 // TODO: DEPRECIATE SOURCINGS --- TRANSITION TO ITEMS
@@ -147,25 +143,16 @@ router.route('/sourcings/refresh')
 router.route('/sourcings/status')
 	.get(wineController.showSourcingStatus)
 
-// PRODUCTION RUNS
-// TODO: DEPRECIATE SOURCINGS --- TRANSITION TO ITEMS
-
-router.route('/productionRuns')
-	.get(wineController.getProductionRuns)
-router.route('/productionRuns/refresh')
-	.get(wineController.refreshProductionRuns)
-router.route('/productionRuns/status')
-	.get(wineController.showProductionRunsStatus)
-router.route('/productionRuns/status/:production')
-	.get(wineController.getProductionWorkflowHistory)
-
 
 
 // WORKS
 
 router.route('/works')
 	.get(workController.getWorks)
-	.post(workController.addWork)
+	.post(workController.postWork)
+router.route('/works/:work/todo/:todo')
+	.post(workController.addTodoToWork)
+	.put(workController.addTodoToWork)
 
 // PEOPLE
 
@@ -178,8 +165,19 @@ router.route('/people/:person')
 			res.json(req.person)
 		})
 
-// ROUTES
+// WORKFLOWS
+router.route('/processes')
+	.get(processController.getProcesses)
+	.post(processController.postProcess)
+router.route('/processes/options')
+	.get(processController.getOptions)
+router.route('/processes/counts')
+	.get(processController.getCounts)
+router.route('/processes/:process')
+	.get(processController.getProcessItems)
 
+
+// ROUTES
 router.get('/routes', routeController.getRoutes);
 router.route('/routes/:route')
 	.get(function(req, res, next){
@@ -214,7 +212,8 @@ router.route('/todos')
 	.get(auth, todoController.getTodos) // Service Exists
 	.post(todoController.postTodos)
 router.get('/todos/pull', todoController.pullTodos)
-
+router.route('/todos/:todo/stories')
+	.get(todoController.getTodoStories)
 router.route('/todos/Incomplete/pull')
 	.get(todoController.pullIncompleteTasks)
 
@@ -241,6 +240,17 @@ router.route('/todos/pull/incomplete')
 
 router.route('/todos/:todo/assign/:assignee')
 	.put(todoController.todoPutByIdAssign)
+
+// WINES 
+// TODO: DEPRECIATE WINES --- TRANSITION TO ITEMS
+
+router.route('/wines')
+	.get(wineController.getWines)
+router.route('/wines/refresh')
+	.get(wineController.refreshWines)
+router.route('/wines/status')
+	.get(wineController.showWinesStatus)
+router.route('/wines/status/:item')
 
 // PARAMETERS
  
@@ -316,6 +326,16 @@ router.param('todo', function(req, res, next, id){
 		if (err){return next(err); }
 		if (!todo) {return next(new Error('can\'t find todo'));}
 		req.todo = todo;
+		return next();
+	})
+})
+
+router.param('work', function(req, res, next, id){
+	var query = Work.findById(id);
+	query.exec(function(err, work){
+		if (err){return next(err); }
+		if (!work) {return next(new Error('can\'t find work'));}
+		req.work = work;
 		return next();
 	})
 })

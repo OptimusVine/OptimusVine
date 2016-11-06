@@ -80,8 +80,6 @@ var pullIncompleteTasks = function(projectId){
 	    	}
 	    }
 	}
-
-//	console.log("Pulling Incomplete Tasks for : " + projectId)
 	return new Promise(function(resolve, reject){
 		request(options, function(err, response){
 			if(err){console.log(err)}
@@ -100,16 +98,13 @@ var pullTasksMyTasks = function(assignee){
 	        "Accept": "application/json"
 	    ,   "Authorization": "Bearer " + token}
 	}
-
 	return new Promise(function(resolve, reject){
 	request(options, function(err, response){
 			if(err){console.log(err)}
 			var resBody	= JSON.parse(response.body)
 			resBody.data.forEach(function(t){
-			//	console.log(t)
 			})
 			resolve(resBody.data)
-		//	console.log(response.body.data)
 		})
 	})
 }
@@ -281,7 +276,7 @@ var pullTask = function(t){
 				} else {
 			//		console.log('Status Code: ' + response.statusCode)
 					var data = JSON.parse(response.body).data;
-				//	console.log(data)
+			//		console.log(data)
 			//		console.log("Preparing up update task to DB")
 					updateAsanaInDatabase(data).then(function(todo){
 					//	console.log("I have updated the task in the DB")
@@ -291,6 +286,19 @@ var pullTask = function(t){
 				//		console.log(err)
 					})
 				}
+		})
+	})
+}
+
+var getStories = function(req){
+	var t = req.todo
+	return new Promise(function(resolve){
+		resetOptionsTask(t)
+		options.url += '/stories'
+		request(options, function(err, result){
+			var d = JSON.parse(result.body)
+		//	console.log(d.data)
+			resolve(d.data)
 		})
 	})
 }
@@ -308,7 +316,7 @@ var completeTask = function(req){
 			if(err){console.log(err); res.send("Error Received")}
 			if(response.statusCode == 201 || response.statusCode == 200){
 				d = response.body.data	
-				console.log(d)
+		//		console.log(d)
 				updateAsanaInDatabase(d).then(function(todo){
 				resolve(todo)
 			})
@@ -326,9 +334,10 @@ var completeTask = function(req){
 
 // Load full data pulled from the API into the DB
 var updateAsanaInDatabase = function(asanaResult){
-//	console.log(asanaResult)
+  //	console.log(asanaResult)
 	return new Promise(function(resolve){
 		if(asanaResult.id){
+			console.log(asanaResult)
 			conditions = { 'asana_id': asanaResult.id};
 			update = {	name: asanaResult.name,
 						summary: asanaResult.notes,
@@ -338,7 +347,7 @@ var updateAsanaInDatabase = function(asanaResult){
 						asana_assignee: asanaResult.assignee,
 						projects: asanaResult.projects
 					};
-			console.log(conditions)
+	//		console.log(conditions)
 			query = ToDo.findOneAndUpdate(conditions, update)
 			query.exec(function(err,todo){
 		//		console.log(todo._id + " has been updated from Asana")
@@ -353,6 +362,7 @@ var updateAsanaInDatabase = function(asanaResult){
 
 module.exports = {
 	createTask: createTask,
+	getStories: getStories,
 	pullWorkspaces: pullWorkspaces,
 	pullTasksMyTasks: pullTasksMyTasks,
 	processDownloadedTask: processDownloadedTask,
