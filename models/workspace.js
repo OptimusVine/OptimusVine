@@ -7,7 +7,8 @@ var WorkspaceSchema = new mongoose.Schema({
 	id: {type: Number},
 	category: {type: String},
 	label: {type: String},
-	uri: {type: String}
+	uri: {type: String},
+	lastUpdate: {type: Date}
 	})
 
 mongoose.model('Workspace', WorkspaceSchema);

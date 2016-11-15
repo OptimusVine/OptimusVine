@@ -5,8 +5,9 @@ var mongoose = require('mongoose');
 
 var ItemSchema = new mongoose.Schema({
 	id: {type: Number},
+	rank: {type: String, required: true, default: 'a'},
 	workspace: {type: Number},
-	type: {type: String},
+	type: {type: String, required: true},
 	description: {type: String},
 	uri: {type: String},
 	plmItem: {type: Object}

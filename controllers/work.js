@@ -7,7 +7,7 @@ var Promise = require('bluebird')
 var Work = mongoose.model('Work') 
 
 var getWorks = function(req, res, next){
-	Work.find().populate('todos').exec(function(err, w){
+	Work.find().populate('todos').populate('items').exec(function(err, w){
 		res.json(w)
 	})
 }
@@ -58,25 +58,69 @@ var postWork = function(req, res, next){
 	}
 }
 
+var completeWork = function(req, res){
+	if(!req.work){
+		res.send({message: "No Work"})
+	} else {
+		req.work.status = {complete: true, stage: "Finished"}
+		req.work.save(function(err, result){
+			if(err){
+				res.send({message: "Error on Completing Work"})
+			} else {
+				res.send({message: "Work is " + result.status.stage})
+			}
+		})
+	}
+}
+
+var addItemToWork = function(req, res){
+	if(!req.item){
+		res.send({message: "No Item"})
+	} else if (!req.work){
+		res.send({message: "No Work"})
+	} else if ( checkForDup(req.work.items, req.item) != -1 ){
+		res.send({message: "Already Exists in Record"})
+	} else {
+		req.work.items.push(req.item)
+		req.work.save(function(err, result){
+			if(err){
+				res.send({message: "Error on Saving Item to Work"})
+			} else {
+				res.send({message: "Item has been saved"})
+			}
+		})
+	}
+}
+
 var addTodoToWork = function(req, res){
-	console.log("AM I HERE!?")
-	console.log(req.body)
 	if(!req.todo){
 		res.send({message: "No Todo"})
 	} else if (!req.work){
 		res.send({message: "No Work"})
-	} else {
+	} else if( checkForDup(req.work.todos, req.todo) != -1 ){ 
+		res.send({message: "Already Exists in Record"})
+	}else{
 		req.work.todos.push(req.todo)
 		req.work.save(function(err, result){
-			res.send({message: "Todo has been saved"})
+			if(err){
+				res.send({message: "Error on Saving Todo to Work"})
+			} else {
+				res.send({message: "Todo has been saved"})
+			}
 		})
-		
 	}
+}
+
+var checkForDup = function(array, obj){
+	var pos = array.indexOf(obj._id);
+	return pos
 }
 
 module.exports = {
 	addTodoToWork: addTodoToWork,
+	addItemToWork: addItemToWork,
 	addWork: addWork,
+	completeWork: completeWork,
 	getWorks: getWorks,
 	postWork: postWork
 }

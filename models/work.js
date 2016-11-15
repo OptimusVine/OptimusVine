@@ -7,6 +7,10 @@ var WorkSchema = new mongoose.Schema({
 	id: {type: String},
 	title: {type: String, required: true},
 	description: {type: String},
+	status: {
+		complete: {type: Boolean, default: false, required: true},
+		stage: {type: String, default: "Unstarted", required: true}
+	},
 	todos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'ToDo'}],
 	services: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Service'}],
 	orders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order'}],

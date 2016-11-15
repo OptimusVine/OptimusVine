@@ -123,14 +123,19 @@ router.route('/workspaces/update')
 // ITEMS
 router.route('/items')
 	.get(itemController.getItems)
+router.route('/items/pull')
+	.get(itemController.pullAllFromPLM)
+router.route('/items/:item/changeRank')
+	.put(itemController.changeRank)
 router.route('/items/:type')
 	.get(itemController.getItemsByType)
 router.route('/items/:type/examine')
 	.get(itemController.examineItems)
 router.route('/items/:type/pull')
-	.get(itemController.pullFromPLMbyType)
+	.get(itemController.remotePullByType)
 router.route('/items/:type/:item')
 	.get(itemController.getItemById)
+
 
 
 // SOURCING
@@ -153,6 +158,10 @@ router.route('/works')
 router.route('/works/:work/todo/:todo')
 	.post(workController.addTodoToWork)
 	.put(workController.addTodoToWork)
+router.route('/works/:work/item/:item')
+	.put(workController.addItemToWork)
+router.route('/works/:work/complete')
+	.put(workController.completeWork)
 
 // PEOPLE
 
