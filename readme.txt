@@ -6,6 +6,7 @@ Home page will have a link to Sites, Routes, Todos
 People
 PLACES
 Items
+Rules
 
 Work
 	ToDos
