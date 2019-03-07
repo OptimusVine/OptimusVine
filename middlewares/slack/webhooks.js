@@ -6,7 +6,7 @@ var request = require('request')
 var env = process.env.NODE_ENV
 
 if(env == 'development'){
-	var keys = require('../../private/keys').keys
+	var keys = require('../../private/keys') 
 	var token = keys.slack.token
 	var webhook = keys.slack.webhooks.kjiel
 } else {
@@ -16,9 +16,11 @@ if(env == 'development'){
 
 var headers = {"Content-type": "application/json"}
 
-var sendMessage = function(text){
+var sendMessage = function(text, webhook){
 	console.log("Inside webhook.js")
 	console.log(text)
+//	console.log(webhookX)
+//	webhookX = "https://hooks.slack.com/services/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"
 	console.log(webhook)
 	return new Promise(function(resolve, reject){
 	var message = {"text":text}

@@ -16,7 +16,7 @@ var ToDoSchema = new mongoose.Schema({
 	asana_id: {type: Number, unique: true},
 	asana_assignee: {type: Object},
 	projects: {type: Object},
-	critical: {type: Boolean}
+	wines: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Wine'}]
 });
 
 ToDoSchema.methods.addToDo = function(err) {

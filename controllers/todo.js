@@ -1,6 +1,5 @@
 var sLoc = __filename.substring(process.cwd().length,__filename.length);
 console.log("Calling : " + sLoc)
-var logger = require('../kj_modules/logger')
 
 var mongoose = require('mongoose');
 
@@ -18,13 +17,6 @@ var getTodos = function(req, res, next){
 		})*/
 		res.json(todos)
 	})
-}
-
-var setCrtical = function(req, res, next){
-	logger.result('setting Critical', req.body)
-	// id of tag "CRITICAL" in Asana : 1112336402732728
-	asana.completeTask(req).then(function(task){console.log(task);	res.send(task)	})
-	res.send('Please build functionality')
 }
 
 var getMyTasks = function(req, res, next){
@@ -98,7 +90,7 @@ var completeToDo = function(req, res, next){
 // Pulls all incomplete tasks based on the hardcoded list
 // calls a function in the asana file to grab project list one by one
 var pullIncompleteTasks = function(req, res){
-	projects = [1112103529453402,1112255175085630]
+	projects = [159790025348212, 168506215476292, 88419022206391, 205804092915017]
 	res.json({message:"Starting Task Download", count: projects.length, projects: projects})
 	projectCount = 0
 	resultCount = 0
@@ -107,7 +99,7 @@ var pullIncompleteTasks = function(req, res){
 	console.log("*** Pulling tasks for " + projects.length + " projects ***")
 	for(i=0;i<projects.length;i++){
 		asana.pullIncompleteTasks(projects[i]).then(function(tasks){
-			console.log(tasks)
+
 			for(j=0;j<tasks.length;j++){
 				results.push(tasks[j])
 			}

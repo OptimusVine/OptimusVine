@@ -1,1 +1,1 @@
-// require('./fusion_lifecycle/auth').getAuth()
+require('./fusion_lifecycle/auth').getAuth()

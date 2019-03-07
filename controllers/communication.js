@@ -6,11 +6,8 @@ var slackBackend = require('../middlewares/slack/backend')
 
 var mongoose = require('mongoose');
 
+var People = mongoose.model('People') 
 var Webhook = mongoose.model('Webhook') 
-
-var getMeetings = function(req, res){
-    small.getMeetings()
-}
 
 var getWebhooks = function(req, res){
     Webhook.find(function(err, w){
@@ -34,12 +31,14 @@ var sendMessageSlack = function(req, res){
 var postMessageSlack = function(req, res){
     var message = req.body.text
     console.log(req.body)
-    webhooks.sendMessage(message).then(function(){
+    getWebhook(req.body.slackId).then(function(webhookBody){
+        webhooks.sendMessage(message, webhookBody.webhook).then(function(){
             console.log("sending response")
             res.status(200)
             var body = JSON.stringify({"result":"Message Received"})
             res.send(body)
         }) 
+    })
 }
 
 var getWebhook = function(slackId){
@@ -55,5 +54,4 @@ module.exports = {
     postMessageSlack: postMessageSlack,
     postWebhooks: postWebhooks,
     sendMessageSlack: sendMessageSlack,   
-    getMeetings: getMeetings
 }

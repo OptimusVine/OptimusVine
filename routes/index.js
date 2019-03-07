@@ -6,34 +6,30 @@ var express = require('express');
 var router = express.Router();
 var passport = require('passport');
 
-var logger = require('../kj_modules/logger')
-
 var secret = "SECRET"
 var expressJWT = require('express-jwt')
 var jwt = require('jsonwebtoken')
 var auth = expressJWT({secret: secret}).unless({path: ['/']})
  
 var mongoose = require('mongoose')
-// var Route = mongoose.model('Route')
-// var Site = mongoose.model('Site')
-// var People = mongoose.model('People')
+var Route = mongoose.model('Route')
+var Site = mongoose.model('Site')
+var People = mongoose.model('People')
 var Todo = mongoose.model('ToDo')
-var Sherman = mongoose.model('Sherman')
-// var Item = mongoose.model('Item')
-// var Process = mongoose.model('Process')
-// var Production = mongoose.model('Production')
-// var Work = mongoose.model('Work')
+var Item = mongoose.model('Item')
+var Process = mongoose.model('Process')
+var Production = mongoose.model('Production')
+var Work = mongoose.model('Work')
 
-// var adminController = require('../controllers/admin')
-// var itemController = require('../controllers/item')
- var peopleController = require('../controllers/people')
-// var processController = require('../controllers/process')
-// var routeController = require('../controllers/routes')
-// var siteController = require('../controllers/sites')
-// var workController = require('../controllers/work')
+var adminController = require('../controllers/admin')
+var itemController = require('../controllers/item')
+var peopleController = require('../controllers/people')
+var processController = require('../controllers/process')
+var routeController = require('../controllers/routes')
+var siteController = require('../controllers/sites')
+var workController = require('../controllers/work')
 var todoController = require('../controllers/todo')
-var shermanController = require('../controllers/sherman')
-// var wineController = require('../controllers/wine')
+var wineController = require('../controllers/wine')
 var communicationController = require('../controllers/communication')
 
 router.get('/', function(req, res, next) {
@@ -93,31 +89,18 @@ router.route('/user')
 
 
 // ADMIN
-
-/*
 router.route('/admin/reloadData')
 	.get(adminController.reloadData)
-*/
 
-// SHERMANS
 
-router.route('/shermans')
-	.get(shermanController.getShermans)
-	.post(shermanController.createSherman)
-router.route('/shermans/:sherman/tee')
-	.post(shermanController.postTee)
-router.route('/tees')
-	.get(shermanController.getTees)
-router.route('/today')
-	.get(function(req, res){
-		var d = new Date();
-		d.setHours(0,0,0,0);
-		logger.result('Passing Date via API', d)
-		res.send(d)
-	})
 
 
 // TESTS
+
+router.get('/test', wineController.getAuth);
+
+
+
  
 // COMMUNICATION
 router.route('/comm/webhooks')
@@ -129,17 +112,15 @@ router.route('/message/sendSlack')
 
 // WORKSPACES
 
-/*
 router.route('/workspaces')
 	.get(wineController.getWorkspaces)
 router.route('/workspaces/update')
 	.get(itemController.updateWorkspaces)
-*/
+
 
 
 
 // ITEMS
-/*
 router.route('/items')
 	.get(itemController.getItems)
 router.route('/items/pull')
@@ -154,26 +135,23 @@ router.route('/items/:type/pull')
 	.get(itemController.remotePullByType)
 router.route('/items/:type/:item')
 	.get(itemController.getItemById)
-	*/
 
 
 
 // SOURCING
 // TODO: DEPRECIATE SOURCINGS --- TRANSITION TO ITEMS
 
-/*
 router.route('/sourcings')
 	.get(wineController.getSourcing)
 router.route('/sourcings/refresh')
 	.get(wineController.refreshSourcing)
 router.route('/sourcings/status')
 	.get(wineController.showSourcingStatus)
-*/
+
 
 
 // WORKS
 
-/*
 router.route('/works')
 	.get(workController.getWorks)
 	.post(workController.postWork)
@@ -184,7 +162,6 @@ router.route('/works/:work/item/:item')
 	.put(workController.addItemToWork)
 router.route('/works/:work/complete')
 	.put(workController.completeWork)
-	*/
 
 // PEOPLE
 
@@ -198,7 +175,6 @@ router.route('/people/:person')
 		})
 
 // WORKFLOWS
-/*
 router.route('/processes')
 	.get(processController.getProcesses)
 	.post(processController.postProcess)
@@ -208,11 +184,9 @@ router.route('/processes/counts')
 	.get(processController.getCounts)
 router.route('/processes/:process')
 	.get(processController.getProcessItems)
-	*/
 
 
 // ROUTES
-/*
 router.get('/routes', routeController.getRoutes);
 router.route('/routes/:route')
 	.get(function(req, res, next){
@@ -223,13 +197,10 @@ router.route('/routes/:route/date')
 	.get(routeController.getDate)
 router.route('/routes/:route/setScheduleDate/:date')
 	.get(routeController.setScheduleDate)
-	*/
 
 	//.post(routeController.addRoute) // This has not been tested
 
 // SITES
-
-/*
 
 router.get('/sites', siteController.getSites);
 router.route('/sites/:sites')
@@ -243,13 +214,11 @@ router.route('/sites/:sites/addSiteToRoute/:route')
 	.get(siteController.addSiteToRoute)
 router.route('/sites/:sites/date')
 	.get(siteController.getDate)
-	*/
 
 // TODOS
 
 router.route('/todos')
-	.get(todoController.getTodos)
-//	.get(auth, todoController.getTodos) // Service Exists
+	.get(auth, todoController.getTodos) // Service Exists
 	.post(todoController.postTodos)
 router.get('/todos/pull', todoController.pullTodos)
 router.route('/todos/:todo/stories')
@@ -284,7 +253,6 @@ router.route('/todos/:todo/assign/:assignee')
 // WINES 
 // TODO: DEPRECIATE WINES --- TRANSITION TO ITEMS
 
-/*
 router.route('/wines')
 	.get(wineController.getWines)
 router.route('/wines/refresh')
@@ -292,7 +260,6 @@ router.route('/wines/refresh')
 router.route('/wines/status')
 	.get(wineController.showWinesStatus)
 router.route('/wines/status/:item')
-*/
 
 // PARAMETERS
  
@@ -306,53 +273,6 @@ router.param('item', function(req, res, next, id){
 	})
 })
 
-router.param('person', function(req, res, next, id){
-	var query = People.findById(id);
-	query.exec(function(err, person){
-		if (err){return next(err); }
-		if (!person) {return next(new Error('can\'t find person'));}
-		req.person = person;
-		return next();
-	})
-})
-
-router.param('todo', function(req, res, next, id){
-	var query = Todo.findById(id);
-	query.exec(function(err, todo){
-		if (err){return next(err); }
-		if (!todo) {return next(new Error('can\'t find todo'));}
-		req.todo = todo;
-		return next();
-	})
-})
-
-router.param('assignee', function(req, res, next, assignee){
-	req.assignee = assignee;
-		return next()
-})
-
-router.param('date', function(req, res, next, id){
-	var year = id.substring(0,4);
-	var month = id.substring(4,6);
-	var day = id.substring(6,8)
-	var date =  new Date(year, month -1, day)
-	console.log(date)
-	req.date = date;
-	return next()
-})
-
-router.param('sherman', function(req, res, next, id){
-	logger.event("Looking for Sherman by ID")
-	var query = Sherman.findById(id);
-	query.exec(function(err, sherman){
-		if (err){return next(err); }
-		if (!sherman) {return next(new Error('can\'t find sherman'));}
-		req.sherman = sherman;
-		return next();
-	})
-})
-
-/*
 router.param('type', function(req, res, next, type){
 	//	console.log("looking for type : ")
 		req.type = type;
@@ -389,12 +309,32 @@ router.param('production', function(req, res, next, id){
 	})
 })
 
+router.param('person', function(req, res, next, id){
+	var query = People.findById(id);
+	query.exec(function(err, person){
+		if (err){return next(err); }
+		if (!person) {return next(new Error('can\'t find person'));}
+		req.person = person;
+		return next();
+	})
+})
+
 router.param('process', function(req, res, next, id){
 	var query = Process.findById(id).populate('children');
 	query.exec(function(err, p){
 		if (err){return next(err); }
 		if (!p) {return next(new Error('can\'t find process'));}
 		req.p = p;
+		return next();
+	})
+})
+
+router.param('todo', function(req, res, next, id){
+	var query = Todo.findById(id);
+	query.exec(function(err, todo){
+		if (err){return next(err); }
+		if (!todo) {return next(new Error('can\'t find todo'));}
+		req.todo = todo;
 		return next();
 	})
 })
@@ -408,8 +348,20 @@ router.param('work', function(req, res, next, id){
 		return next();
 	})
 })
-*/
 
+router.param('assignee', function(req, res, next, assignee){
+	req.assignee = assignee;
+		return next()
+})
 
+router.param('date', function(req, res, next, id){
+	var year = id.substring(0,4);
+	var month = id.substring(4,6);
+	var day = id.substring(6,8)
+	var date =  new Date(year, month -1, day)
+	console.log(date)
+	req.date = date;
+	return next()
+})
 
 module.exports = router;
