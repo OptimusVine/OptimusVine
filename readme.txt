@@ -1,3 +1,18 @@
+The Process
+	Pay for ourselves, make money on wasted payroll, high costs, etc...
+	Tell you as it is, no BS, no politics. Don't have to like us, but you'll respect us
+		
+
+
+Link ToDo's
+	Slack Messages 
+		To be followed up on or answered
+		To send clean messaging
+	Small Improvements 
+
+
+
+
 Anytime a site is added to a route, it should add the route and nextDate to the site.
 
 Home page will have a link to Sites, Routes, Todos

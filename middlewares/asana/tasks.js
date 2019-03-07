@@ -15,7 +15,7 @@ var env = process.env.NODE_ENV
 //var env = 'development'
 
 if(env == "development" || "test"){
-	var token = require('../../private/keys').asana.token
+	var token = require('../../private/keys').keys.asana.token
 } else {
 	var token = process.env.asana_token_kjiel
 }
@@ -27,8 +27,10 @@ if(env == "development" || "test"){
 if (token){console.log("\n ----- Asana Token: ***HIDDEN*** ----- \n" )}
 
 
-var projectId = 88419022206391
-var workspaceId = 2733326967720
+var projectId = 1112103529453402
+var workspaceId = 908849352797
+
+	// id of tag "CRITICAL" in Asana : 1112336402732728
 
 var pullWorkspaces = function(){
 	options = {
@@ -89,6 +91,12 @@ var pullIncompleteTasks = function(projectId){
 	})
 }
 
+var setCritical = function(task){
+	return new Promise(function(resolve, reject){
+		resolve('this currently does not work')
+	})
+}
+
 var pullTasksMyTasks = function(assignee){
 	if(!assignee){var assignee = 10363492364586}
 	options = {
@@ -121,7 +129,7 @@ var createTask = function(task){
     		},
     	json: {
     		data: {
-    			"projects": [88419022206391], // This is hard coded to fromScratch project
+    			"projects": [1112103529453402], // This is hard coded to fromScratch project
     			"name": task.name,
     			"assignee": task.asana_assignee.id,
     			"notes": task.summary

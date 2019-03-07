@@ -8,7 +8,7 @@ var peopleController = require('../../controllers/people')
 var env = process.env.NODE_ENV
 
 if(env == 'development'){
-	var keys = require('../../private/keys') 
+	var keys = require('../../private/keys').keys
 	var token = keys.slack.token
 	var webhook = keys.slack.webhooks.kjiel
 } else {

@@ -4,67 +4,125 @@ var logger = require('../kj_modules/logger')
 
 var mongoose = require('mongoose');
 
-var ToDo = mongoose.model('ToDo')
-var People = mongoose.model('People')
+var Sherman = mongoose.model('Sherman') 
+var Tee = mongoose.model('Tee') 
 
-var asana = require('../middlewares/asana/tasks');
 
+var getShermans = function(req, res, next){
+	logger.event('Requesting Shermans')
+	Sherman.find({}).populate({
+		path: 'tees',
+		limit: 5
+	})
+		.exec(function(err, shermans){
+        res.json(shermans)
+    })
+}
+
+var createSherman = function(req, res, next){
+	logger.result('Creating Sherman', req.body)
+	if(!req.body.name){res.status(400).send('Something broke!')}
+		else {
+			var s = new Sherman(req.body)
+			s.save(function(err, sherman){
+				res.send(sherman)
+			})		
+		}
+}
+
+var newTee = function(req, res){
+	var t = new Tee(req.body)
+	t.sherman = req.sherman
+	t.created = new Date()
+	t.save(function(err, tee){
+		if (err){logger.result("Error at Tee Save", err)}
+		req.sherman.tees.push(tee)
+		req.sherman.save(function(err, sh){
+			logger.result('Attempting to save Sherman after entering Tee', sh)
+		})
+		res.send(tee)
+	})
+}
+
+var postTee = function ( req, res, next){
+	logger.result('Adding Tee', req.body)
+	if(!req.sherman || !req.body.data){res.status(400).send('Something broke!')}
+	else {
+		var d = new Date();
+		d.setHours(0,0,0,0);
+		var dp1 = new Date();
+		dp1.setHours(24,0,0,0);
+		var q = {
+			created: {
+				$gte: d,
+				$lt: dp1
+			}	
+		}
+		console.log(d)
+		console.log(dp1)
+		Tee.find(q)
+			.populate('sherman')
+			.exec(function(err, tees){
+				console.log(tees)
+				logger.result("Looking for same day tees", tees)
+				if(err){res.send({error: "error on find based on date"})}
+				else if (tees.length < 1 || !tees){ // If this is the first Sherman of the day
+					var t = new Tee(req.body)
+					t.sherman = req.sherman
+					t.created = new Date()
+					t.save(function(err, tee){
+						if (err){logger.result("Error at Tee Save", err)}
+						req.sherman.tees.push(tee)
+						req.sherman.save(function(err, sh){
+							logger.result('Attempting to save Sherman after entering Tee', sh)
+						})
+						res.send(tee)
+					})	
+				} else { // If other work has been done today
+					logger.result("Looking for Tee with Sherman: ", req.sherman._id)
+					var rs_id = req.sherman._id
+					var foundTee = 0
+					for(i=0;i<tees.length;i++){
+						for(j=0;j<tees[i].sherman.length;j++){
+							if(new String(tees[i].sherman[j]._id).trim() == new String(req.sherman._id).trim()){
+								foundTee = tees[i]
+							}
+						}
+					}
+					if (foundTee == 0){
+						newTee(req, res)
+					} else {
+						logger.result("Found existing dtstamp", foundTee)
+						foundTee.data += '::' + req.body.data
+						foundTee.save(function(err, tee){
+							res.send(tee)
+						})
+					}
+
+					
+				}
+			})
+	}
+}
+
+
+
+
+var getTees = function(req, res, next){
+	logger.event('Requesting Tees')
+    Tee.find(function(err, tees){
+        res.json(tees)
+    })
+}
+
+/*
 var getTodos = function(req, res, next){
 	ToDo.find(function(err, todos){
-	/*	todos.forEach(function(t){
-			if(!t.projects[0]){
-				t.projects.push({name: "no project"})
-			}
-		})*/
 		res.json(todos)
 	})
 }
 
-var setCrtical = function(req, res, next){
-	logger.result('setting Critical', req.body)
-	// id of tag "CRITICAL" in Asana : 1112336402732728
-	asana.completeTask(req).then(function(task){console.log(task);	res.send(task)	})
-	res.send('Please build functionality')
-}
 
-var getMyTasks = function(req, res, next){
-	console.log("Assignee via Request: " + req.assignee)
-	var assignee = 10363492364586
-	asana.pullTasksMyTasks(assignee).then(function(tasks){
-		return processDownloadedTask(tasks)
-	}).catch(function(err){}).then(function(todos){
-		res.send(todos)
-	})
-}
-
-var getAssignees = function(){
-	var q = {'asana_assignee.id':{$ne:null}}
-	ToDo.find(q, function(err, results){
-
-		console.log(results.length)
-		return results
-	}).then(function(results){
-		var arr = []
-		for(i=0;i<results.length;i++){
-			if (!results[i].asana_assignee) {
-				console.log("ERROR : No ASSIGNEE " + results[i].name)
-			}else if(results[i].asana_assignee.id == null){
-				console.log("NO ASSIGNEE!?!?!")
-				console.log(results[i])
-			} else {
-				if(arr.indexOf(results[i].asana_assignee.id) == -1){
-					arr.push(results[i].asana_assignee.id)
-				}
-			}
-		}
-	//	console.log(arr)
-		var q = {'asana_assignee':{$in: arr}}
-		People.find(q, function(err, results){
-			console.log(results)
-			return results
-		})
-	})
-}
 
 var postTodos = function(req, res, next){
 	if(!req.body.name){res.status(400).send('Something broke!');
@@ -216,16 +274,11 @@ var processDownloadedTask = function(tasks){
 		}
 	})
 }
+*/
 
 module.exports = {
-	getTodoStories: getTodoStories,
-	todoPutByIdAssign: todoPutByIdAssign,
-	pullFullTask: pullFullTask,
-	pullTodos: pullTodos,
-	completeToDo: completeToDo,
-	getTodos: getTodos,
-	postTodos: postTodos, 
-	pullIncompleteTasks: pullIncompleteTasks,
-	updateIncompleteTasks: updateIncompleteTasks,
-	getMyTasks: getMyTasks
+	createSherman: createSherman,
+	getShermans: getShermans,
+	getTees: getTees,
+	postTee: postTee
 }

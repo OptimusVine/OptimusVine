@@ -4,18 +4,11 @@ console.log("Calling : " + sLoc)
 // This calls all of the models
 // It is called from the main app.js page to load all of the models into Mongoose
 
-var item = require('./items.js')
-var order = require('./orders.js')
+
 var people = require('./people.js')
-var production = require('./production.js')
-var route = require('./route.js')
-var rule = require('./rules.js')
-var service = require('./service.js')
-var site = require('./site.js')
-var sourcing = require('./sourcing.js')
+
 var todo = require('./todo.js')
+var tee = require('./tee.js')
 var user = require('./user.js')
+var sherman = require('./sherman.js')
 var webhook = require('./webhook.js')
-var work = require('./work.js')
-var _process = require('./process.js')
-var workspace = require('./workspace.js')

@@ -7,7 +7,8 @@ var mongoose = require('mongoose')
 var env = process.env.NODE_ENV
 
 if(env == "development" || "test"){
-	var keys = require('../../private/keys')
+	var keys = require('../../private/keys').keys
+	console.log(keys)
 	var userId = keys.autodesk.userId
 	var password = keys.autodesk.password
 } else {
@@ -52,6 +53,7 @@ var getAuth = function(){
 			console.log("Error attempting to reach PLM for Authentication")
 		} else {
 		//	console.log(response)
+			console.log(response.body)
 			var resBody = JSON.parse(response.body);
 			sessionid = resBody.sessionid;
 			cookieString = "customer=CLUBW;JSESSIONID=" + sessionid.toString();

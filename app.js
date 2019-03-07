@@ -1,7 +1,9 @@
-console.log("***** Route Planner App *****")
+console.log("***** The Process Backend App *****")
 console.log("The problem is NOT creating");
 console.log("The problem is NOT imagining");
 console.log("The true problem is imagining AND creating at the level you are happy with");
+console.log("Don't let perfect be the enemy of good")
+console.log("   - Voltaire")
 console.log("***** ")
 
 var cors = require('cors')
@@ -97,18 +99,4 @@ app.listen(app.get('port'), function() {
 
 
 module.exports = app;
-
-/*
-var speaker = ["Kjiel", "MHD"]
-var speech = [
-				"This is working, " + speaker[0], 
-				"That's bullshit, " + speaker [1]
-				]
-
-for(i=0; i<speech.length; i++){
-	console.log(speech[i]);
-}
-
-people.listPeople(speaker);
-*/
 
